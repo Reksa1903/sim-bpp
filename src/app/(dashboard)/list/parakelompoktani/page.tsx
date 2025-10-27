@@ -1,4 +1,7 @@
 // ✅ src/app/(dashboard)/list/parakelompoktani/page.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs'; // wajib agar Prisma jalan di Node runtime
 
 import FormContainer from '@/components/FormContainer';
 import Pagination from '@/components/Pagination';
