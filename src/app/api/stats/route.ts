@@ -4,23 +4,25 @@ import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const runtime = "nodejs";
+export const runtime = "nodejs"; // pastikan ini ada
 
 export async function GET() {
   try {
-    // ✅ Skip Prisma saat proses build di Vercel (NEXT_BUILD=true)
-    if (process.env.NEXT_BUILD === "true") {
-      return NextResponse.json({ message: "Skipping stats during build" });
+    // ✅ Cegah Prisma jalan saat build di Vercel
+    if (process.env.NEXT_PHASE === "phase-production-build") {
+      return NextResponse.json({ message: "Skipping API during build" });
     }
 
+    // ✅ Pastikan DATABASE_URL ada
     if (!process.env.DATABASE_URL) {
-      console.warn("DATABASE_URL is missing");
+      console.warn("DATABASE_URL missing");
       return NextResponse.json(
         { error: "Database URL not set" },
         { status: 500 }
       );
     }
 
+    // ✅ Query database
     const [admin, penyuluh, kelompokTani, kiosPertanian, kegiatan] =
       await Promise.all([
         prisma.admin.count(),
