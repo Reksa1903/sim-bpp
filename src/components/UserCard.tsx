@@ -7,17 +7,15 @@ const UserCard = async ({
   type: 'Admin' | 'Kelompok_Tani' | 'Penyuluh_Pertanian' | 'Kios_Pertanian';
 }) => {
   // Gunakan path relatif, bukan process.env
-  const res = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_API_URL
-        ? 'https://' + process.env.NEXT_PUBLIC_API_URL
-        : ''
-    }/api/stats`,
-    {
-      cache: 'no-store',
-      next: { revalidate: 0 },
-    }
-  );
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : 'http://localhost:3000';
+
+  const res = await fetch(`${baseUrl}/api/stats`, {
+    cache: 'no-store',
+  });
+
   const stats = await res.json();
 
   const countMap: Record<typeof type, number> = {

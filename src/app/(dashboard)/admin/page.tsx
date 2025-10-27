@@ -24,12 +24,14 @@ export default function AdminPage({
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/stats`,
-          {
-            cache: 'no-store',
-          }
-        );
+        const baseUrl =
+          process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VERCEL_URL
+            ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+            : 'http://localhost:3000';
+
+        const res = await fetch(`${baseUrl}/api/stats`, {
+          cache: 'no-store',
+        });
         const data = await res.json();
         setStats(data);
       } catch (error) {

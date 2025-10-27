@@ -3,10 +3,15 @@ import Image from 'next/image';
 import ActivityChart from './ActivityChart';
 
 const ActivityChartContainer = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stats`, {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : 'http://localhost:3000';
+
+  const res = await fetch(`${baseUrl}/api/stats`, {
     cache: 'no-store',
-    next: { revalidate: 0 },
   });
+
   const stats = await res.json();
 
   const kegiatanData = stats.kegiatan || [];
