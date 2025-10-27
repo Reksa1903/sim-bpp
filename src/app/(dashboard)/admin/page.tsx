@@ -1,4 +1,11 @@
 // src/app/(dashboard)/admin/page.tsx
+console.log('🔍 BUILD-TIME ENV CHECK:', {
+  DATABASE_URL: process.env.DATABASE_URL,
+  DIRECT_URL: process.env.DIRECT_URL,
+  CLERK_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+});
+
 import ActivityChartContainer from '@/components/ActivityChartContainer';
 import Announcements from '@/components/Announcements';
 import CountChartContainer from '@/components/CountChartContainer';
@@ -47,12 +54,5 @@ const AdminPage = ({
     </div>
   );
 };
-
-console.log('🔍 BUILD-TIME ENV CHECK:', {
-  DATABASE_URL: process.env.DATABASE_URL,
-  DIRECT_URL: process.env.DIRECT_URL,
-  CLERK_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-  CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-});
 
 export default AdminPage;
