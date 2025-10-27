@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Admin {
@@ -19,43 +20,43 @@ model Penyuluh {
   id          String             @id @default(uuid())
   username    String             @unique
   name        String
-  surname     String
   email       String?            @unique
   phone       String             @unique
   address     String
   img         String?
   bidang      String[]
-  gender      UserSex
-  birthday    DateTime // tanggal lahir
   createdAt   DateTime           @default(now())
-  materi      Materi[]
-  kegiatan    Kegiatan[]
-  dokumentasi DokumentasiAcara[]
-  pengumuman  Pengumuman[]
+  birthday    DateTime
+  gender      UserSex
+  surname     String
   desaBinaan  DesaBinaan[]
+  dokumentasi DokumentasiAcara[]
+  kegiatan    Kegiatan[]
+  materi      Materi[]
+  pengumuman  Pengumuman[]
 }
 
 model DesaBinaan {
   id           String         @id @default(uuid())
   name         String
-  penyuluhId   String? // now nullable
-  penyuluh     Penyuluh?      @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
+  penyuluhId   String?
+  penyuluh     Penyuluh?      @relation(fields: [penyuluhId], references: [id])
   kelompokTani KelompokTani[]
   pengumuman   Pengumuman[]
 }
 
 model KelompokTani {
   id           String       @id @default(uuid())
-  username     String
   name         String
   ketua        String
-  luasArea     Float?
   phone        String       @unique
   address      String
   img          String?
   createdAt    DateTime     @default(now())
   desaBinaanId String?
-  desaBinaan   DesaBinaan?  @relation(fields: [desaBinaanId], references: [id], onDelete: SetNull)
+  username     String
+  luasArea     Float?
+  desaBinaan   DesaBinaan?  @relation(fields: [desaBinaanId], references: [id])
   pengumuman   Pengumuman[]
 }
 
@@ -65,31 +66,31 @@ model KiosPertanian {
   owner      String
   address    String
   phone      String           @unique
-  img        String? // Menambahkan kolom gambar (opsional)
   createdAt  DateTime         @default(now())
+  img        String?
   pengumuman KiosPengumuman[]
 }
 
 model Materi {
-  id         String    @id @default(uuid())
   title      String
   fileName   String
   fileUrl    String
   uploadDate DateTime  @default(now())
   updateDate DateTime  @updatedAt
-  penyuluhId String? // now nullable
-  penyuluh   Penyuluh? @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
+  penyuluhId String?
+  id         String    @id @default(uuid())
+  penyuluh   Penyuluh? @relation(fields: [penyuluhId], references: [id])
 }
 
 model Kegiatan {
-  id          String    @id @default(uuid())
   title       String    @unique
   description String
   startDate   DateTime
   endDate     DateTime
   day         Day
-  penyuluhId  String? // now nullable
-  penyuluh    Penyuluh? @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
+  penyuluhId  String?
+  id          String    @id @default(uuid())
+  penyuluh    Penyuluh? @relation(fields: [penyuluhId], references: [id])
 }
 
 model DokumentasiAcara {
@@ -98,8 +99,8 @@ model DokumentasiAcara {
   description String
   photo       String
   date        DateTime
-  penyuluhId  String? // now nullable
-  penyuluh    Penyuluh? @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
+  penyuluhId  String?
+  penyuluh    Penyuluh? @relation(fields: [penyuluhId], references: [id])
 }
 
 model Pengumuman {
@@ -108,19 +109,19 @@ model Pengumuman {
   description    String
   date           DateTime         @default(now())
   penyuluhId     String?
-  penyuluh       Penyuluh?        @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
   kelompokTaniId String?
-  kelompokTani   KelompokTani?    @relation(fields: [kelompokTaniId], references: [id], onDelete: SetNull)
   desaBinaanId   String?
-  desaBinaan     DesaBinaan?      @relation(fields: [desaBinaanId], references: [id], onDelete: SetNull)
   kios           KiosPengumuman[]
+  desaBinaan     DesaBinaan?      @relation(fields: [desaBinaanId], references: [id])
+  kelompokTani   KelompokTani?    @relation(fields: [kelompokTaniId], references: [id])
+  penyuluh       Penyuluh?        @relation(fields: [penyuluhId], references: [id])
 }
 
 model KiosPengumuman {
   id              String         @id @default(uuid())
   kiosPertanianId String?
   pengumumanId    String
-  kiosPertanian   KiosPertanian? @relation(fields: [kiosPertanianId], references: [id], onDelete: SetNull)
+  kiosPertanian   KiosPertanian? @relation(fields: [kiosPertanianId], references: [id])
   pengumuman      Pengumuman     @relation(fields: [pengumumanId], references: [id], onDelete: Cascade)
 
   @@unique([kiosPertanianId, pengumumanId])
