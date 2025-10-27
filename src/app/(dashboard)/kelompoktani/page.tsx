@@ -1,4 +1,8 @@
-// src/app/(dashboard)/kelompoktani/page
+// src/app/(dashboard)/kelompoktani/page.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import Announcements from '@/components/Announcements';
 import BigCalendarContainer from '@/components/BigCalendarContainer';
 import EventCalendar from '@/components/EventCalendar';
