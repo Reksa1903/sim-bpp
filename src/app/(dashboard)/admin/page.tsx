@@ -1,5 +1,5 @@
-// src/app/(dashboard)/admin/page.tsx
 'use client';
+// src/app/(dashboard)/admin/page.tsx
 
 console.log('🔍 BUILD-TIME ENV CHECK:', {
   DATABASE_URL: process.env.DATABASE_URL,
