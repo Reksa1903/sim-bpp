@@ -13,6 +13,16 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      colors: {
+        BppGreen: "#CAE8BD",
+        BppLightGreen: "#eff8eb",
+        BppBlue: "#C3EBFA",
+        BppLightBlue: "#EDF9FD",
+        BppYellow: "#FAE27C",
+        BppLightYellow: "#FEFCE8",
+        BppPurple: "#CFCEFF",
+        BppLightPurple: "#f1f0ff",
+      },
     },
   },
   plugins: [],

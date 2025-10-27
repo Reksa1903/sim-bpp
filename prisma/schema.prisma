@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Penyuluh {
+  id          String             @id @default(uuid())
+  username    String             @unique
+  name        String
+  surname     String
+  email       String?            @unique
+  phone       String             @unique
+  address     String
+  img         String?
+  bidang      String[]
+  gender      UserSex
+  birthday    DateTime // tanggal lahir
+  createdAt   DateTime           @default(now())
+  materi      Materi[]
+  kegiatan    Kegiatan[]
+  dokumentasi DokumentasiAcara[]
+  pengumuman  Pengumuman[]
+  desaBinaan  DesaBinaan[]
+}
+
+model DesaBinaan {
+  id           String         @id @default(uuid())
+  name         String
+  penyuluhId   String? // now nullable
+  penyuluh     Penyuluh?      @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
+  kelompokTani KelompokTani[]
+  pengumuman   Pengumuman[]
+}
+
+model KelompokTani {
+  id           String       @id @default(uuid())
+  username     String
+  name         String
+  ketua        String
+  luasArea     Float?
+  phone        String       @unique
+  address      String
+  img          String?
+  createdAt    DateTime     @default(now())
+  desaBinaanId String?
+  desaBinaan   DesaBinaan?  @relation(fields: [desaBinaanId], references: [id], onDelete: SetNull)
+  pengumuman   Pengumuman[]
+}
+
+model KiosPertanian {
+  id         String           @id @default(uuid())
+  name       String
+  owner      String
+  address    String
+  phone      String           @unique
+  img        String? // Menambahkan kolom gambar (opsional)
+  createdAt  DateTime         @default(now())
+  pengumuman KiosPengumuman[]
+}
+
+model Materi {
+  id         String    @id @default(uuid())
+  title      String
+  fileName   String
+  fileUrl    String
+  uploadDate DateTime  @default(now())
+  updateDate DateTime  @updatedAt
+  penyuluhId String? // now nullable
+  penyuluh   Penyuluh? @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
+}
+
+model Kegiatan {
+  id          String    @id @default(uuid())
+  title       String    @unique
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  day         Day
+  penyuluhId  String? // now nullable
+  penyuluh    Penyuluh? @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
+}
+
+model DokumentasiAcara {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  photo       String
+  date        DateTime
+  penyuluhId  String? // now nullable
+  penyuluh    Penyuluh? @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
+}
+
+model Pengumuman {
+  id             String           @id @default(uuid())
+  title          String
+  description    String
+  date           DateTime         @default(now())
+  penyuluhId     String?
+  penyuluh       Penyuluh?        @relation(fields: [penyuluhId], references: [id], onDelete: SetNull)
+  kelompokTaniId String?
+  kelompokTani   KelompokTani?    @relation(fields: [kelompokTaniId], references: [id], onDelete: SetNull)
+  desaBinaanId   String?
+  desaBinaan     DesaBinaan?      @relation(fields: [desaBinaanId], references: [id], onDelete: SetNull)
+  kios           KiosPengumuman[]
+}
+
+model KiosPengumuman {
+  id              String         @id @default(uuid())
+  kiosPertanianId String?
+  pengumumanId    String
+  kiosPertanian   KiosPertanian? @relation(fields: [kiosPertanianId], references: [id], onDelete: SetNull)
+  pengumuman      Pengumuman     @relation(fields: [pengumumanId], references: [id], onDelete: Cascade)
+
+  @@unique([kiosPertanianId, pengumumanId])
+}
+
+enum UserSex {
+  PRIA
+  WANITA
+}
+
+enum Day {
+  Senin
+  Selasa
+  Rabu
+  Kamis
+  Jumat
+}
