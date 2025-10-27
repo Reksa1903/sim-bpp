@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+// src/components/UserCard.tsx
 import Image from 'next/image';
 
 const UserCard = async ({
@@ -6,14 +6,19 @@ const UserCard = async ({
 }: {
   type: 'Admin' | 'Kelompok_Tani' | 'Penyuluh_Pertanian' | 'Kios_Pertanian';
 }) => {
-  const modelMap: Record<typeof type, any> = {
-    Admin: prisma.admin,
-    Penyuluh_Pertanian: prisma.penyuluh,
-    Kelompok_Tani: prisma.kelompokTani,
-    Kios_Pertanian: prisma.kiosPertanian,
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stats`, {
+    cache: 'no-store',
+  });
+  const stats = await res.json();
+
+  const countMap: Record<typeof type, number> = {
+    Admin: stats.admin,
+    Penyuluh_Pertanian: stats.penyuluh,
+    Kelompok_Tani: stats.kelompokTani,
+    Kios_Pertanian: stats.kiosPertanian,
   };
 
-  const data = await modelMap[type].count();
+  const data = countMap[type] || 0;
 
   return (
     <div className="rounded-2xl odd:bg-BppGreen even:bg-BppBlue p-4 flex-1 min-w-[130px]">
