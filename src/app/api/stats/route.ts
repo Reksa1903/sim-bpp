@@ -1,19 +1,17 @@
 // src/app/api/stats/route.ts
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const runtime = "nodejs"; // pastikan ini ada
+export const runtime = "nodejs"; // pastikan runtime Node.js
 
 export async function GET() {
   try {
-    // ✅ Cegah Prisma jalan saat build di Vercel
+    // 🧠 Skip saat build di Vercel
     if (process.env.NEXT_PHASE === "phase-production-build") {
       return NextResponse.json({ message: "Skipping API during build" });
     }
 
-    // ✅ Pastikan DATABASE_URL ada
     if (!process.env.DATABASE_URL) {
       console.warn("DATABASE_URL missing");
       return NextResponse.json(
@@ -21,6 +19,9 @@ export async function GET() {
         { status: 500 }
       );
     }
+
+    // 🧩 Import prisma hanya ketika runtime
+    const { default: prisma } = await import("@/lib/prisma");
 
     // ✅ Query database
     const [admin, penyuluh, kelompokTani, kiosPertanian, kegiatan] =
