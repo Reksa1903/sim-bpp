@@ -3,8 +3,9 @@ import Image from 'next/image';
 import ActivityChart from './ActivityChart';
 
 const ActivityChartContainer = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stats`, {
+  const res = await fetch('/api/stats', {
     cache: 'no-store',
+    next: { revalidate: 0 },
   });
   const stats = await res.json();
 

@@ -6,46 +6,72 @@ console.log('🔍 BUILD-TIME ENV CHECK:', {
   CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
 });
 
-import ActivityChartContainer from '@/components/ActivityChartContainer';
+// src/app/(dashboard)/admin/page.tsx
+('use client');
+
+import { useEffect, useState } from 'react';
 import Announcements from '@/components/Announcements';
-import CountChartContainer from '@/components/CountChartContainer';
-import EventCalendar from '@/components/EventCalendar';
 import EventCalendarContainer from '@/components/EventCalendarContainer';
 import PanenChart from '@/components/PanenChart';
-import UserCard from '@/components/UserCard';
 
-const AdminPage = ({
+export default function AdminPage({
   searchParams,
 }: {
   searchParams: { [keys: string]: string | undefined };
-}) => {
+}) {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        setStats(data);
+      } catch (error) {
+        console.error('Fetch stats failed:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return <div className="p-4">Loading dashboard data...</div>;
+  }
+
+  if (!stats) {
+    return <div className="p-4 text-red-500">Failed to load data.</div>;
+  }
+
   return (
     <div className="p-4 flex gap-4 flex-col md:flex-row">
       {/* LEFT */}
       <div className="w-full lg:w-2/3 flex flex-col gap-8">
-        {/* USE CARDS  */}
+        {/* USER CARDS */}
         <div className="flex gap-4 justify-between flex-wrap">
-          <UserCard type="Admin" />
-          <UserCard type="Kelompok_Tani" />
-          <UserCard type="Penyuluh_Pertanian" />
-          <UserCard type="Kios_Pertanian" />
+          <UserCard title="Admin" count={stats.admin} />
+          <UserCard title="Penyuluh" count={stats.penyuluh} />
+          <UserCard title="Kelompok Tani" count={stats.kelompokTani} />
+          <UserCard title="Kios Pertanian" count={stats.kiosPertanian} />
         </div>
-        {/* MIDDLE CHARTS */}
+
+        {/* CHART PLACEHOLDERS */}
         <div className="flex gap-4 flex-col lg:flex-row">
-          {/* COUNT CHART */}
-          <div className="w-full lg:w-1/3 h-[450px]">
-            <CountChartContainer />
+          <div className="w-full lg:w-1/3 h-[450px] bg-white rounded-xl flex items-center justify-center">
+            <p>CountChart (data: {stats.kelompokTani + stats.kiosPertanian})</p>
           </div>
-          {/* ACTIVITY CHART */}
-          <div className="w-full lg:w-2/3 h-[450px]">
-            <ActivityChartContainer />
+          <div className="w-full lg:w-2/3 h-[450px] bg-white rounded-xl flex items-center justify-center">
+            <p>ActivityChart (total kegiatan: {stats.kegiatan.length})</p>
           </div>
         </div>
-        {/* BOTTOM CHARTS */}
+
         <div className="w-full h-[500px]">
           <PanenChart />
         </div>
       </div>
+
       {/* RIGHT */}
       <div className="w-full lg:w-1/3 flex flex-col gap-8">
         <EventCalendarContainer searchParams={searchParams} />
@@ -53,6 +79,13 @@ const AdminPage = ({
       </div>
     </div>
   );
-};
+}
 
-export default AdminPage;
+function UserCard({ title, count }: { title: string; count: number }) {
+  return (
+    <div className="rounded-2xl odd:bg-BppGreen even:bg-BppBlue p-4 flex-1 min-w-[130px]">
+      <h1 className="text-2xl font-semibold my-4">{count}</h1>
+      <h2 className="capitalize text-sm font-medium text-gray-500">{title}</h2>
+    </div>
+  );
+}

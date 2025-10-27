@@ -6,9 +6,16 @@ const UserCard = async ({
 }: {
   type: 'Admin' | 'Kelompok_Tani' | 'Penyuluh_Pertanian' | 'Kios_Pertanian';
 }) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stats`, {
-    cache: 'no-store',
-  });
+  // Gunakan path relatif, bukan process.env
+  const res = await fetch(
+    `${
+      process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : ''
+    }/api/stats`,
+    {
+      cache: 'no-store',
+      next: { revalidate: 0 },
+    }
+  );
   const stats = await res.json();
 
   const countMap: Record<typeof type, number> = {
