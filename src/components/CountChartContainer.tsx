@@ -3,7 +3,7 @@ import Image from 'next/image';
 import CountChart from './CountChart';
 
 const CountChartContainer = async () => {
-  const res = await fetch('/api/stats', {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stats`, {
     cache: 'no-store',
     next: { revalidate: 0 },
   });

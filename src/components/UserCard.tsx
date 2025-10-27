@@ -9,7 +9,9 @@ const UserCard = async ({
   // Gunakan path relatif, bukan process.env
   const res = await fetch(
     `${
-      process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : ''
+      process.env.NEXT_PUBLIC_API_URL
+        ? 'https://' + process.env.NEXT_PUBLIC_API_URL
+        : ''
     }/api/stats`,
     {
       cache: 'no-store',

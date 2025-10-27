@@ -1,15 +1,12 @@
 'use client';
-// src/app/(dashboard)/admin/page.tsx
 
+// src/app/(dashboard)/admin/page.tsx
 console.log('🔍 BUILD-TIME ENV CHECK:', {
   DATABASE_URL: process.env.DATABASE_URL,
   DIRECT_URL: process.env.DIRECT_URL,
   CLERK_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
 });
-
-// src/app/(dashboard)/admin/page.tsx
-('use client');
 
 import { useEffect, useState } from 'react';
 import Announcements from '@/components/Announcements';
@@ -27,7 +24,12 @@ export default function AdminPage({
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await fetch('/api/stats');
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/stats`,
+          {
+            cache: 'no-store',
+          }
+        );
         const data = await res.json();
         setStats(data);
       } catch (error) {
