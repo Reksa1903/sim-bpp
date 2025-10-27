@@ -45,6 +45,11 @@ const AdminPage = ({
       </div>
     </div>
   );
+
+  console.log('ENV CHECK:', {
+    CLERK_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    API_URL: process.env.NEXT_PUBLIC_API_URL,
+  });
 };
 
 export default AdminPage;
