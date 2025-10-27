@@ -4,12 +4,12 @@ import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const runtime = "nodejs"; // ✅ pastikan pakai Node runtime, bukan Edge
+export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    // 🚧 Cegah Prisma dijalankan saat build di Vercel
-    if (process.env.VERCEL === "1" && process.env.NEXT_PHASE === "phase-production-build") {
+    // ✅ Skip Prisma saat proses build di Vercel (NEXT_BUILD=true)
+    if (process.env.NEXT_BUILD === "true") {
       return NextResponse.json({ message: "Skipping stats during build" });
     }
 
