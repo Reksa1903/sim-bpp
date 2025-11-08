@@ -3,14 +3,17 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
 
-const Announcements = async () => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/pengumuman`,
-    {
-      cache: 'no-store',
-    }
-  );
-  const data = await res.json();
+import { useEffect, useState } from 'react';
+
+const Announcements = () => {
+  const [data, setData] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/pengumuman')
+      .then((res) => res.json())
+      .then(setData)
+      .catch(console.error);
+  }, []);
 
   return (
     <div className="bg-white p-4 rounded-md">
