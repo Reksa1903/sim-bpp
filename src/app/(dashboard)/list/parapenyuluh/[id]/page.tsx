@@ -10,13 +10,17 @@ import { notFound } from 'next/navigation';
 import { auth } from '@clerk/nextjs/server';
 import BigCalendarContainer from '@/components/BigCalendarContainer';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 const SinglePenyuluhPage = async ({
   params: { id },
 }: {
   params: { id: string };
 }) => {
   // Ambil role user dari Clerk
-  const { default: prisma } = await import('@/lib/prisma');
+  // const { default: prisma } = await import('@/lib/prisma');
 
   const { sessionClaims } = await auth();
   const role = (sessionClaims?.metadata as { role?: string })?.role;

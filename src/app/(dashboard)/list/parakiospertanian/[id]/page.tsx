@@ -1,5 +1,4 @@
 // src/app/(dashboard)/list/parakiospertanian/[id]/page.tsx
-
 import Announcements from '@/components/Announcements';
 import Performance from '@/components/Performance';
 import prisma from '@/lib/prisma';
@@ -8,12 +7,16 @@ import { notFound } from 'next/navigation';
 import FormContainer from '@/components/FormContainer';
 import { auth } from '@clerk/nextjs/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 const SingleKiosPertanianPage = async ({
   params: { id },
 }: {
   params: { id: string };
 }) => {
-  const { default: prisma } = await import('@/lib/prisma');
+  // const { default: prisma } = await import('@/lib/prisma');
 
   // 🔹 Ambil role dari Clerk (agar hanya admin bisa edit)
   const { sessionClaims } = await auth();
