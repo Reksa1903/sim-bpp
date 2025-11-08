@@ -23,7 +23,13 @@ const DesaBinaanListPage = async ({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-  const role = await getRole();
+  let role: string | undefined = 'guest';
+  try {
+    role = await getRole();
+  } catch (error) {
+    console.warn('getRole() gagal dijalankan di build, fallback ke guest');
+    role = 'guest';
+  }
 
   const { page, search } = searchParams;
   const p = page ? parseInt(page) : 1;
