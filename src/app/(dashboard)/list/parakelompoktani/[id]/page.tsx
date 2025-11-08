@@ -1,41 +1,31 @@
 // src/app/(dashboard)/list/parakelompoktani/[id]/page.tsx
+import type { Materi, Kegiatan, DokumentasiAcara } from '@prisma/client';
 import { unstable_noStore as noStore } from 'next/cache';
+import NextDynamic from 'next/dynamic';
 
-import dynamic from 'next/dynamic';
+export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 export const runtime = 'nodejs';
 
 import FotoKegiatan from '@/components/FotoKegiatan';
-import prisma from '@/lib/prisma'; // ✅ cukup ini saja
+import prisma from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-const FormContainer = dynamic(() => import('@/components/FormContainer'), {
-  ssr: false,
-});
-const Performance = dynamic(() => import('@/components/Performance'), {
-  ssr: false,
-});
-const Announcements = dynamic(() => import('@/components/Announcements'), {
-  ssr: false,
-});
-const BigCalendarContainer = dynamic(
-  () => import('@/components/BigCalendarContainer'),
-  { ssr: false }
-);
+const FormContainer = NextDynamic(() => import('@/components/FormContainer'), { ssr: false });
+const Performance = NextDynamic(() => import('@/components/Performance'), { ssr: false });
+const Announcements = NextDynamic(() => import('@/components/Announcements'), { ssr: false });
+const BigCalendarContainer = NextDynamic(() => import('@/components/BigCalendarContainer'), { ssr: false });
 
 type CalendarEvent = { title: string; start: Date; end: Date };
 
-const SingleKelompokTaniPage = async ({ params: { id } }: { params: { id: string } }) => ({  
-  params: { id },
-}: {
-  params: { id: string };
-}) => {
-  // const { default: prisma } = await import('@/lib/prisma');
-    noStore();
-    const { id } = params;
+const SingleKelompokTaniPage = async (
+  { params }: { params: { id: string } }
+) => {
+  noStore();                 // ⬅️ render runtime, tanpa cache
+  const { id } = params;
 
   // ---- Ambil role untuk hak akses ----
   const { sessionClaims } = await auth();
@@ -61,26 +51,26 @@ const SingleKelompokTaniPage = async ({ params: { id } }: { params: { id: string
   const penyuluhId = penyuluhPembina?.id || null;
 
   // ---- Ambil materi, kegiatan, dokumentasi milik penyuluh pembina ----
-  const [materi, kegiatan, dokumentasi] = await prisma.$transaction([
-    prisma.materi.findMany({
-      where: penyuluhId ? { penyuluhId } : { id: '' },
-      orderBy: { uploadDate: 'desc' },
-      take: 50,
-    }),
-    prisma.kegiatan.findMany({
-      where: penyuluhId ? { penyuluhId } : { id: '' },
-      orderBy: { startDate: 'asc' },
-      take: 200,
-    }),
-    prisma.dokumentasiAcara.findMany({
-      where: penyuluhId ? { penyuluhId } : { id: '' },
-      orderBy: { date: 'desc' },
-      take: 9,
-    }),
-  ]);
+  const [materi, kegiatan, dokumentasi]: [Materi[], Kegiatan[], DokumentasiAcara[]] =
+    await prisma.$transaction([
+      prisma.materi.findMany({
+        where: penyuluhId ? { penyuluhId } : { id: '' },
+        orderBy: { uploadDate: 'desc' },
+        take: 50,
+      }),
+      prisma.kegiatan.findMany({
+        where: penyuluhId ? { penyuluhId } : { id: '' },
+        orderBy: { startDate: 'asc' },
+        take: 200,
+      }),
+      prisma.dokumentasiAcara.findMany({
+        where: penyuluhId ? { penyuluhId } : { id: '' },
+        orderBy: { date: 'desc' },
+        take: 9,
+      }),
+    ]);
 
-  // ---- Siapkan data untuk kalender ----
-  const calendarData: CalendarEvent[] = kegiatan.map((k) => ({
+  const calendarData: CalendarEvent[] = kegiatan.map((k: Kegiatan) => ({
     title: k.title,
     start: k.startDate,
     end: k.endDate,
