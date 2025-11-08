@@ -1,30 +1,26 @@
 // next.config.mjs
-import withPWA from "next-pwa";
-
-const isDev = process.env.NODE_ENV !== "production";
+import withPWA from 'next-pwa';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // HAPUS: distDir
   reactStrictMode: true,
   swcMinify: true,
   compiler: {
-    removeConsole: process.env.NODE_ENV !== "development",
+    removeConsole: process.env.NODE_ENV !== 'development',
   },
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "images.pexels.com", pathname: "/**" },
-      { protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" },
+      { protocol: 'https', hostname: 'images.pexels.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'res.cloudinary.com', pathname: '/**' },
     ],
-    domains: ["res.cloudinary.com"],
+    domains: ['res.cloudinary.com'],
   },
-  // JANGAN pakai output: 'export' untuk proyek ini
-  // (Opsional) output: 'standalone' tidak wajib di Vercel
 };
 
 export default withPWA({
-  dest: "public",
-  disable: isDev,     // nonaktif saat development
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
   register: true,
   skipWaiting: true,
+  // ❌ JANGAN pakai output: 'export'
 })(nextConfig);
