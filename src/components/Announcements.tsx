@@ -10,7 +10,12 @@ const Announcements = () => {
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/pengumuman')
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VERCEL_URL
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/pengumuman`
+        : '/api/pengumuman';
+
+    fetch(apiUrl)
       .then((res) => res.json())
       .then(setData)
       .catch(console.error);

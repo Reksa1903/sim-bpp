@@ -10,7 +10,8 @@ export async function GET() {
   // 🧱 Skip waktu build (Vercel)
   if (!process.env.DATABASE_URL) {
     console.error("DATABASE_URL is missing!");
-    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+    return NextResponse.json({ error: "Database not configured" },
+      { status: 500 });
   }
 
   // ✅ Lazy import prisma (hindari dieksekusi saat build)
