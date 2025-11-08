@@ -28,28 +28,33 @@ const DesaBinaanListPage = async ({
   const { page, search } = searchParams;
   const p = page ? parseInt(page) : 1;
 
-  // 🔍 Filter pencarian
   const query: Prisma.DesaBinaanWhereInput = {};
   if (search) {
     query.name = { contains: search, mode: 'insensitive' };
   }
 
-  // 📦 Ambil data + total count
-  const [data, count] = await prisma.$transaction([
-    prisma.desaBinaan.findMany({
-      where: query,
-      include: {
-        penyuluh: true,
-        kelompokTani: true,
-      },
-      take: ITEM_PER_PAGE,
-      skip: ITEM_PER_PAGE * (p - 1),
-      orderBy: { name: 'asc' },
-    }),
-    prisma.desaBinaan.count({ where: query }),
-  ]);
+  let data: DesaBinaanList[] = [];
+  let count = 0;
 
-  // 🧱 Definisi kolom tabel
+  try {
+    // 📦 Ambil data + total count
+    [data, count] = await prisma.$transaction([
+      prisma.desaBinaan.findMany({
+        where: query,
+        include: {
+          penyuluh: true,
+          kelompokTani: true,
+        },
+        take: ITEM_PER_PAGE,
+        skip: ITEM_PER_PAGE * (p - 1),
+        orderBy: { name: 'asc' },
+      }),
+      prisma.desaBinaan.count({ where: query }),
+    ]);
+  } catch (error) {
+    console.error('❌ Error fetching desa binaan:', error);
+  }
+
   const columns = [
     { header: 'Nama Desa', accessor: 'name' },
     {
@@ -65,19 +70,13 @@ const DesaBinaanListPage = async ({
     ...(role === 'admin' ? [{ header: 'Aksi', accessor: 'actions' }] : []),
   ];
 
-  // 🧩 Render isi tiap baris tabel
   const renderRow = (item: DesaBinaanList) => (
     <tr
       key={item.id}
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-BppLightBlue"
     >
-      {/* Nama Desa */}
       <td className="p-4 font-semibold">{item.name}</td>
-
-      {/* Penyuluh */}
       <td className="hidden md:table-cell">{item.penyuluh?.name || '-'}</td>
-
-      {/* Kelompok Tani */}
       <td className="hidden lg:table-cell">
         {item.kelompokTani.length > 0
           ? `${item.kelompokTani
@@ -86,8 +85,6 @@ const DesaBinaanListPage = async ({
               .join(', ')}${item.kelompokTani.length > 2 ? ', …' : ''}`
           : '-'}
       </td>
-
-      {/* Aksi (hanya admin) */}
       {role === 'admin' && (
         <td>
           <div className="flex items-center gap-2">
@@ -101,13 +98,11 @@ const DesaBinaanListPage = async ({
 
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
-      {/* 🧭 Header */}
       <div className="flex items-center justify-between">
         <h1 className="hidden md:block text-lg font-semibold">
           Daftar Desa Binaan
         </h1>
 
-        {/* 🔍 Pencarian + Filter */}
         <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
           <TableSearch />
           <div className="flex items-center gap-4 self-end">
@@ -118,7 +113,6 @@ const DesaBinaanListPage = async ({
               <Image src="/sort.png" alt="sort" width={14} height={14} />
             </button>
 
-            {/* ➕ Tambah Desa Binaan (admin only) */}
             {role === 'admin' && (
               <FormContainer table="desabinaan" type="create" />
             )}
@@ -126,10 +120,15 @@ const DesaBinaanListPage = async ({
         </div>
       </div>
 
-      {/* 📋 Tabel daftar desa */}
-      <Table columns={columns} renderRow={renderRow} data={data} />
+      {/* Jika gagal fetch data, tampilkan pesan error */}
+      {data.length === 0 ? (
+        <div className="text-center text-gray-500 p-8">
+          Tidak ada data Desa Binaan.
+        </div>
+      ) : (
+        <Table columns={columns} renderRow={renderRow} data={data} />
+      )}
 
-      {/* 📄 Pagination */}
       <Pagination page={p} count={count} />
     </div>
   );
