@@ -1,3 +1,8 @@
+// src/app/(dashboard)/list/materi/page.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import FormContainer from '@/components/FormContainer';
 import FormModal from '@/components/FormModal';
 import Pagination from '@/components/Pagination';

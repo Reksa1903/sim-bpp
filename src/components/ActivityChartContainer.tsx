@@ -2,6 +2,10 @@
 import Image from 'next/image';
 import ActivityChart from './ActivityChart';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 const ActivityChartContainer = async () => {
   const baseUrl =
     process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VERCEL_URL

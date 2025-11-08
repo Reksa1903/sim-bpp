@@ -1,6 +1,10 @@
 // src/components/forms/DokumentasiAcaraForm.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import { useFormState } from 'react-dom';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { toast } from 'react-toastify';

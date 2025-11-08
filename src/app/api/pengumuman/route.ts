@@ -1,4 +1,4 @@
-// src/app/api/pengumumam/route.ts
+// src/app/api/pengumuman/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 

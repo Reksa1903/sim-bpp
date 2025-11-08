@@ -1,4 +1,8 @@
 // ✅ src/app/(dashboard)/list/desabinaan/page.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import FormContainer from '@/components/FormContainer';
 import Pagination from '@/components/Pagination';
 import Table from '@/components/Table';

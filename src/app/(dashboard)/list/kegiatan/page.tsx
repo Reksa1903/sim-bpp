@@ -1,3 +1,8 @@
+// src/app/(dashboard)/list/kegiatan/page.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import Pagination from '@/components/Pagination';
 import Table from '@/components/Table';
 import TableSearch from '@/components/TableSearch';

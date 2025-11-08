@@ -1,6 +1,10 @@
 // src/components/forms/KiosPertanianForm.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import InputField from '../InputField';
