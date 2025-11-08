@@ -3,6 +3,8 @@ import type { Materi, Kegiatan, DokumentasiAcara } from '@prisma/client';
 import { unstable_noStore as noStore } from 'next/cache';
 import NextDynamic from 'next/dynamic';
 
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
 export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 export const runtime = 'nodejs';
