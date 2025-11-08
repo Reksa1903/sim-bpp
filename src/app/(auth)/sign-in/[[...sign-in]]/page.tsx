@@ -1,3 +1,4 @@
+// src/app/(auth)/sign-in/[[...sign-in]]/page.tsx
 'use client';
 
 import * as Clerk from '@clerk/elements/common';
