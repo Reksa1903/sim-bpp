@@ -33,5 +33,5 @@ export default withPWA({
   disable: process.env.NODE_ENV === "development", // PWA nonaktif di dev mode
   register: true, // auto register service worker
   skipWaiting: true, // langsung aktif setelah update
-  output: 'export',
+  output: 'standalone',
 })(nextConfig);
