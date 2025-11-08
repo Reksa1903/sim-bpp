@@ -17,6 +17,15 @@ const nextConfig = {
   },
 };
 
+export async function rewrites() {
+  const api = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API; // contoh: balanced-salmon-2.clerk.accounts.dev
+  return {
+    beforeFiles: [
+      { source: '/clerk/:path*', destination: `https://${api}/:path*` },
+    ],
+  };
+}
+
 export default withPWA({
   dest: 'public',
   disable: process.env.NODE_ENV === 'development',
@@ -45,9 +54,10 @@ export default withPWA({
     // Gambar aplikasi (opsional)
     {
       urlPattern: ({ url }) =>
-        url.origin === self.location.origin &&
-        (url.pathname.startsWith('/uploads') || url.pathname.startsWith('/photos')),
-      handler: 'StaleWhileRevalidate',
+        url.pathname.startsWith('/clerk/') || // proxy lokal
+        url.hostname.endsWith('clerk.accounts.dev') ||
+        url.hostname.endsWith('clerk.services'),
+      handler: 'NetworkOnly',
       options: {
         cacheName: 'app-images',
         expiration: { maxEntries: 256, maxAgeSeconds: 60 * 60 * 24 * 30 },

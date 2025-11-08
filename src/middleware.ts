@@ -13,28 +13,33 @@ const isAuthPath = (p: string) => p.startsWith('/sign-in') || p.startsWith('/sig
 export default clerkMiddleware(async (auth, req) => {
   const url = new URL(req.url);
 
-  // 0) BYPASS untuk request RSC/Flight dan aset SW
+  // BYPASS: RSC/Flight, SW assets, Next assets, static files, dan **jalur proxy Clerk**
   if (
-    url.searchParams.has('_rsc') ||                      // App Router data
-    url.pathname === '/sw.js' ||                        // service worker file
-    /^\/workbox-.*\.js$/.test(url.pathname) ||          // workbox helper
-    url.pathname.startsWith('/_next/') ||               // aset Next
-    /\.[a-zA-Z0-9]+$/.test(url.pathname)                // semua file statik
+    url.searchParams.has('_rsc') ||
+    url.pathname === '/sw.js' ||
+    /^\/workbox-.*\.js$/.test(url.pathname) ||
+    url.pathname.startsWith('/_next/') ||
+    url.pathname.startsWith('/clerk/') || // <— penting: jangan intercept proxy Clerk
+    /\.[a-zA-Z0-9]+$/.test(url.pathname)
   ) {
     return NextResponse.next();
   }
 
   const { userId, sessionClaims } = await auth();
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
 
-  // 1) Belum login → redirect ke sign-in (kecuali di halaman auth)
+  // Dev instance kadang taruh role di publicMetadata
+  const role =
+    (sessionClaims?.metadata as { role?: string })?.role ??
+    (sessionClaims?.publicMetadata as { role?: string })?.role ?? null;
+
+  // Belum login → arahkan ke sign-in (kecuali di halaman auth)
   if (!userId && !isAuthPath(url.pathname)) {
     return NextResponse.redirect(
       new URL(process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in', req.url)
     );
   }
 
-  // 2) Cek ACL berbasis peta route
+  // Cek ACL berbasis peta route
   if (userId && role) {
     for (const { matcher, allowedRoles } of matchers) {
       if (matcher(req) && !allowedRoles.includes(role)) {
@@ -46,10 +51,10 @@ export default clerkMiddleware(async (auth, req) => {
   return NextResponse.next();
 });
 
-// Matcher sederhana ala Clerk: jangan intercept file statik & _next
+// Matcher: selain static & _next, **opsional** sekalian exclude /clerk dari intercept
 export const config = {
   matcher: [
-    '/((?!.*\\..*|_next).*)',
+    '/((?!.*\\..*|_next|clerk).*)', // <— tambahkan |clerk untuk aman
     '/(api|trpc)(.*)',
   ],
 };
