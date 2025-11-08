@@ -3,10 +3,7 @@ import dynamic from 'next/dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
 
-import Announcements from '@/components/Announcements';
-import BigCalendarContainer from '@/components/BigCalendarContainer';
 import FotoKegiatan from '@/components/FotoKegiatan';
-import Performance from '@/components/Performance';
 import prisma from '@/lib/prisma'; // ✅ cukup ini saja
 import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
@@ -14,8 +11,18 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 const FormContainer = dynamic(() => import('@/components/FormContainer'), {
-  ssr: false, // ⛔ tidak dijalankan di server
+  ssr: false,
 });
+const Performance = dynamic(() => import('@/components/Performance'), {
+  ssr: false,
+});
+const Announcements = dynamic(() => import('@/components/Announcements'), {
+  ssr: false,
+});
+const BigCalendarContainer = dynamic(
+  () => import('@/components/BigCalendarContainer'),
+  { ssr: false }
+);
 
 type CalendarEvent = { title: string; start: Date; end: Date };
 

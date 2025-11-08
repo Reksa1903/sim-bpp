@@ -1,8 +1,9 @@
 // ✅ src/app/(dashboard)/list/desabinaan/page.tsx
-import dynamic from 'next/dynamic';
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
 
+import FormContainer from '@/components/FormContainer';
 import Pagination from '@/components/Pagination';
 import Table from '@/components/Table';
 import TableSearch from '@/components/TableSearch';
@@ -11,10 +12,6 @@ import { ITEM_PER_PAGE } from '@/lib/settings';
 import { getRole } from '@/lib/utils';
 import Image from 'next/image';
 import { DesaBinaan, Penyuluh, KelompokTani, Prisma } from '@prisma/client';
-
-const FormContainer = dynamic(() => import('@/components/FormContainer'), {
-  ssr: false,
-});
 
 type DesaBinaanList = DesaBinaan & {
   penyuluh: Penyuluh | null;
