@@ -54,7 +54,8 @@ export default clerkMiddleware(async (auth, req) => {
 // Matcher: selain static & _next, **opsional** sekalian exclude /clerk dari intercept
 export const config = {
   matcher: [
-    '/((?!.*\\..*|_next|clerk).*)', // <— tambahkan |clerk untuk aman
+    '/((?!.*\\..*|_next|clerk|sign-in|sign-up).*)',
     '/(api|trpc)(.*)',
   ],
 };
+
