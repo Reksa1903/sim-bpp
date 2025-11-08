@@ -1,28 +1,22 @@
 // src/app/api/pengumuman/route.ts
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 
-// Pastikan route ini tidak di-prerender
+// 🚫 Nonaktifkan Prisma di fase build
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const runtime = "nodejs"; // tambahkan ini!
+export const runtime = "nodejs";
 
 export async function GET() {
+  // 🧱 Skip waktu build (Vercel)
+  if (!process.env.DATABASE_URL) {
+    console.error("DATABASE_URL is missing!");
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
+
+  // ✅ Lazy import prisma (hindari dieksekusi saat build)
+  const { default: prisma } = await import("@/lib/prisma");
+
   try {
-    // 🧱 Tambahkan pengaman agar Prisma tidak jalan waktu build
-    if (process.env.NEXT_PHASE === "phase-production-build") {
-      return NextResponse.json({ message: "Skipping API during build" });
-    }
-
-    // 🔐 Cek database URL dulu
-    if (!process.env.DATABASE_URL) {
-      console.warn("DATABASE_URL is missing during build");
-      return NextResponse.json(
-        { error: "Database URL not found" },
-        { status: 500 }
-      );
-    }
-
     const data = await prisma.pengumuman.findMany({
       take: 3,
       orderBy: { date: "desc" },
