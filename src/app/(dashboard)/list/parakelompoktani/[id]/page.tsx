@@ -1,4 +1,6 @@
 // src/app/(dashboard)/list/parakelompoktani/[id]/page.tsx
+import { unstable_noStore as noStore } from 'next/cache';
+
 import dynamic from 'next/dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
@@ -26,7 +28,9 @@ const BigCalendarContainer = dynamic(
 
 type CalendarEvent = { title: string; start: Date; end: Date };
 
-const SingleKelompokTaniPage = async ({
+const SingleKelompokTaniPage = async ({ params: { id } }: { params: { id: string } }) => ({
+  noStore();
+  
   params: { id },
 }: {
   params: { id: string };
