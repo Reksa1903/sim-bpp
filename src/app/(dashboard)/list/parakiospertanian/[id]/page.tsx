@@ -1,4 +1,9 @@
 // src/app/(dashboard)/list/parakiospertanian/[id]/page.tsx
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import Announcements from '@/components/Announcements';
 import Performance from '@/components/Performance';
 import prisma from '@/lib/prisma';
@@ -6,10 +11,6 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import FormContainer from '@/components/FormContainer';
 import { auth } from '@clerk/nextjs/server';
-
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const runtime = 'nodejs';
 
 const SingleKiosPertanianPage = async ({
   params: { id },

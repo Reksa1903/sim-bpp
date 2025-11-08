@@ -1,7 +1,8 @@
 // ✅ src/app/(dashboard)/list/parakelompoktani/page.tsx
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 export const revalidate = 0;
-export const runtime = 'nodejs'; // wajib agar Prisma jalan di Node runtime
+export const runtime = 'nodejs';
 
 import FormContainer from '@/components/FormContainer';
 import Pagination from '@/components/Pagination';
@@ -17,10 +18,10 @@ import Link from 'next/link';
 // 🔷 Tipe data (desaBinaan bisa null)
 type KelompokTaniList = KelompokTani & {
   desaBinaan:
-    | (DesaBinaan & {
-        penyuluh: Penyuluh | null;
-      })
-    | null;
+  | (DesaBinaan & {
+    penyuluh: Penyuluh | null;
+  })
+  | null;
 };
 
 const ParaKelompokTaniListPage = async ({
@@ -111,8 +112,8 @@ const ParaKelompokTaniListPage = async ({
         <Image
           src={
             item.img &&
-            item.img.trim() !== '' &&
-            item.img.trim().toLowerCase() !== 'null'
+              item.img.trim() !== '' &&
+              item.img.trim().toLowerCase() !== 'null'
               ? item.img
               : '/noAvatar.png'
           }

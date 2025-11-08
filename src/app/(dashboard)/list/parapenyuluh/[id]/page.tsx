@@ -1,3 +1,9 @@
+// src/app/(dashboard)/list/parapenyuluh/[id]/page.tsx
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import Announcements from '@/components/Announcements';
 import FormContainer from '@/components/FormContainer';
 import FotoKegiatan from '@/components/FotoKegiatan';
@@ -9,10 +15,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { auth } from '@clerk/nextjs/server';
 import BigCalendarContainer from '@/components/BigCalendarContainer';
-
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const runtime = 'nodejs';
 
 const SinglePenyuluhPage = async ({
   params: { id },
@@ -28,27 +30,27 @@ const SinglePenyuluhPage = async ({
   // Ambil penyuluh + summary counts
   const penyuluh:
     | (Penyuluh & {
-        _count: {
-          pengumuman: number;
-          materi: number;
-          kegiatan: number;
-          desaBinaan: number;
-        };
-      })
-    | null = await prisma.penyuluh.findUnique({
-    where: { id },
-    include: {
       _count: {
-        select: {
-          pengumuman: true,
-          materi: true,
-          kegiatan: true,
-          desaBinaan: true,
+        pengumuman: number;
+        materi: number;
+        kegiatan: number;
+        desaBinaan: number;
+      };
+    })
+    | null = await prisma.penyuluh.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            pengumuman: true,
+            materi: true,
+            kegiatan: true,
+            desaBinaan: true,
+          },
         },
+        desaBinaan: { select: { id: true, name: true } },
       },
-      desaBinaan: { select: { id: true, name: true } },
-    },
-  });
+    });
 
   if (!penyuluh) return notFound();
 
