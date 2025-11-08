@@ -13,6 +13,8 @@ const SingleKiosPertanianPage = async ({
 }: {
   params: { id: string };
 }) => {
+  const { default: prisma } = await import('@/lib/prisma');
+
   // 🔹 Ambil role dari Clerk (agar hanya admin bisa edit)
   const { sessionClaims } = await auth();
   const role = (sessionClaims?.metadata as { role?: string })?.role;

@@ -16,6 +16,8 @@ const SinglePenyuluhPage = async ({
   params: { id: string };
 }) => {
   // Ambil role user dari Clerk
+  const { default: prisma } = await import('@/lib/prisma');
+
   const { sessionClaims } = await auth();
   const role = (sessionClaims?.metadata as { role?: string })?.role;
 
