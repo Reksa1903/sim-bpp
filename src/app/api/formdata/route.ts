@@ -1,22 +1,30 @@
-// src/app/api/formdata/route.ts
-import prisma from '@/lib/prisma';
+// ✅ src/app/api/formdata/route.ts
 import { NextResponse } from 'next/server';
 
-export const dynamicParams = true;
-export const fetchCache = 'force-no-store';
-
-export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+export const runtime = 'nodejs';
+export const fetchCache = 'force-no-store';
 
 export async function GET(request: Request) {
-    try { 
-  const { searchParams } = new URL(request.url);
-  const table = searchParams.get('table');
-  let relatedData: any = {};
+  // 🧱 Skip waktu build
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL is missing!');
+    return NextResponse.json(
+      { error: 'Database not configured' },
+      { status: 500 }
+    );
+  }
+
+  // ✅ Lazy import prisma
+  const { default: prisma } = await import('@/lib/prisma');
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const table = searchParams.get('table');
+    let relatedData: any = {};
 
     switch (table) {
-      // === Penyuluh ===
       case 'penyuluh': {
         const desaBinaan = await prisma.desaBinaan.findMany({
           select: { id: true, name: true },
@@ -25,7 +33,6 @@ export async function GET(request: Request) {
         break;
       }
 
-      // === Kelompok Tani ===
       case 'kelompoktani': {
         const desaBinaan = await prisma.desaBinaan.findMany({
           select: {
@@ -49,7 +56,6 @@ export async function GET(request: Request) {
         break;
       }
 
-      // === Desa Binaan ===
       case 'desabinaan': {
         const penyuluh = await prisma.penyuluh.findMany({
           select: { id: true, name: true },
@@ -72,7 +78,6 @@ export async function GET(request: Request) {
         break;
       }
 
-      // === Materi ===
       case 'materi': {
         const penyuluh = await prisma.penyuluh.findMany({
           select: { id: true, name: true },
@@ -81,7 +86,6 @@ export async function GET(request: Request) {
         break;
       }
 
-      // === Pengumuman ===
       case 'pengumuman': {
         const penyuluh = await prisma.penyuluh.findMany({
           select: { id: true, name: true },
@@ -112,7 +116,6 @@ export async function GET(request: Request) {
         break;
       }
 
-      // === Kegiatan ===
       case 'kegiatan': {
         const penyuluh = await prisma.penyuluh.findMany({
           select: { id: true, name: true },
@@ -121,7 +124,6 @@ export async function GET(request: Request) {
         break;
       }
 
-      // === Dokumentasi Acara ===
       case 'dokumentasiacara': {
         const penyuluh = await prisma.penyuluh.findMany({
           select: { id: true, name: true },
@@ -130,9 +132,7 @@ export async function GET(request: Request) {
         break;
       }
 
-      // === Kios Pertanian ===
       case 'kisopertanian': {
-        // Tidak ada relasi ke tabel lain
         relatedData = {};
         break;
       }
@@ -142,12 +142,11 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json(relatedData, { status: 200 });
-    } catch (err: any) {
-        console.error('❌ Error in /api/formdata:', err.message, err.stack);
-        return NextResponse.json(
-            { error: 'Internal Server Error' },
-            { status: 500 }
-        );
-    }
+  } catch (err: any) {
+    console.error('❌ Error in /api/formdata:', err.message);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
 }
-
