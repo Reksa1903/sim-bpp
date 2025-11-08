@@ -43,6 +43,8 @@ const DesaBinaanListPage = async ({
   let count = 0;
 
   try {
+    const { default: prisma } = await import('@/lib/prisma');
+
     // 📦 Ambil data + total count
     [data, count] = await prisma.$transaction([
       prisma.desaBinaan.findMany({
