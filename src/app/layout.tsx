@@ -1,59 +1,46 @@
-import type { Metadata } from 'next';
+// src/app/layout.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ClerkProvider } from '@clerk/nextjs';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import NextDynamic from 'next/dynamic';
 
 const inter = Inter({ subsets: ['latin'] });
 
+// ⬇️ Pindahkan themeColor & viewport ke export viewport (bukan metadata)
 export const metadata: Metadata = {
   title: 'Sistem Informasi Manajemen BPP',
   description: 'Sistem Informasi Manajemen Balai Penyuluhan Pertanian',
   generator: 'Next.js',
-  manifest: '/manifest.json', // ✅ Link ke manifest
+  manifest: '/manifest.json',
   keywords: ['Next.js', 'Next14', 'PWA', 'next-pwa', 'Sistem Informasi BPP'],
-  themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#ffffff' }],
-  authors: [
-    {
-      name: 'TIM SIM-BPP',
-      url: 'https://example.com', // opsional, bisa diganti dengan situs resmi nanti
-    },
-  ],
-  viewport:
-    'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover',
+  authors: [{ name: 'TIM SIM-BPP', url: 'https://example.com' }],
   icons: [
     { rel: 'apple-touch-icon', url: '/icons/Pemalang-512.png' },
     { rel: 'icon', url: '/icons/Pemalang-512.png' },
   ],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = {
+  themeColor: '#ffffff',
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
+
+// ⬇️ Import client wrapper tanpa SSR
+const ClerkRoot = NextDynamic(() => import('./ClerkRoot'), { ssr: false });
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}
-      signInUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL}
-      signUpUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL}
-      afterSignInUrl="/admin"
-      afterSignUpUrl="/admin"
-      proxyUrl="/clerk">
-      <html lang="id">
-        <head>
-          {/* Tambahan meta dan link untuk manifest */}
-          <meta name="theme-color" content="#ffffff" />
-          <link rel="manifest" href="/manifest.json" />
-          <link rel="icon" href="/icons/Pemalang-512.png" />
-          <link rel="apple-touch-icon" href="/icons/Pemalang-512.png" />
-        </head>
-        <body className={inter.className}>
-          {children}
-          <ToastContainer position="bottom-right" theme="dark" />
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="id">
+      <body className={inter.className}>
+        {/* Semua provider klien dipindah ke ClerkRoot */}
+        <ClerkRoot>{children}</ClerkRoot>
+      </body>
+    </html>
   );
 }
