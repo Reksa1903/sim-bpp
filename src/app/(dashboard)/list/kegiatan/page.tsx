@@ -22,6 +22,7 @@ const KegiatanListPage = async ({
 }) => {
   const role = await getRole(); // 🪄 Ambil role sekali di awal
 
+  const { default: prisma } = await import('@/lib/prisma');
   const { page, ...queryParams } = searchParams;
   const p = page ? parseInt(page) : 1;
 

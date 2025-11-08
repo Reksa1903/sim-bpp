@@ -23,6 +23,8 @@ const DokumentasiAcaraPage = async ({
 }) => {
   const role = await getRole(); // 🪄 ambil role
 
+  const { default: prisma } = await import('@/lib/prisma');
+
   const { page, ...queryParams } = searchParams;
   const p = page ? parseInt(page) : 1;
 

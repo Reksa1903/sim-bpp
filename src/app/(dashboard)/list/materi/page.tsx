@@ -24,6 +24,7 @@ const MateriPenyuluhanListPage = async ({
   // Ambil role user saat ini
   const role = await getRole();
 
+  const { default: prisma } = await import('@/lib/prisma');
   const { page, ...queryParams } = searchParams;
   const p = page ? parseInt(page) : 1;
 
