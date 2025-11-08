@@ -1,4 +1,8 @@
 // src/app/(dashboard)/list/parakelompoktani/[id]/page.tsx
+import dynamic from 'next/dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import Announcements from '@/components/Announcements';
 import BigCalendarContainer from '@/components/BigCalendarContainer';
 import FotoKegiatan from '@/components/FotoKegiatan';
@@ -8,11 +12,10 @@ import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import FormContainer from '@/components/FormContainer'; // ✅ Tambahan
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const runtime = 'nodejs';
+const FormContainer = dynamic(() => import('@/components/FormContainer'), {
+  ssr: false, // ⛔ tidak dijalankan di server
+});
 
 type CalendarEvent = { title: string; start: Date; end: Date };
 
