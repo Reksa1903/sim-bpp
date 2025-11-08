@@ -1,4 +1,4 @@
-// src/components/ClerkRoot.tsx
+// src/app/ClerkRoot.tsx
 'use client';
 
 import { ClerkProvider } from '@clerk/nextjs';

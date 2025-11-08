@@ -1,5 +1,7 @@
 // next.config.mjs
-import withPWA from 'next-pwa'
+import withPWA from 'next-pwa';
+
+const isDev = process.env.NODE_ENV !== 'production';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -13,62 +15,51 @@ const nextConfig = {
     ],
     domains: ['res.cloudinary.com'],
   },
-}
 
-export async function rewrites() {
-  const api = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API // ex: balanced-salmon-2.clerk.accounts.dev
-  return {
-    beforeFiles: [
-      // 1) Asset Clerk (JS/CSS/fonts) dari clerk.services
+  // ⬇️ REWRITES WAJIB di dalam objek config
+  async rewrites() {
+    const api = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API; // e.g. balanced-salmon-2.clerk.accounts.dev
+    if (!api) return [];
+
+    return [
+      // asset statis Clerk (JS/CSS/font) dari clerk.services
       { source: '/clerk/npm@clerk/:path*', destination: 'https://clerk.services/npm@clerk/:path*' },
       { source: '/clerk/assets/:path*', destination: 'https://clerk.services/assets/:path*' },
 
-      // 2) Sisanya (API/pages) ke frontend API dev kamu
+      // semua endpoint lain ke Frontend API milik instance kamu
       { source: '/clerk/:path*', destination: `https://${api}/:path*` },
       { source: '/clerk', destination: `https://${api}` },
-    ],
-  }
-}
+    ];
+  },
+};
 
+// PWA (tetap boleh)
 export default withPWA({
   dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
+  disable: isDev,
   register: true,
   skipWaiting: true,
-
-  // Lindungi App Router & API dari SW
   runtimeCaching: [
-    // App Router RSC/Flight data
-    { urlPattern: ({ url }) => url.searchParams.has('_rsc'), handler: 'NetworkOnly' },
-    // API / TRPC
+    // jangan cache halaman/auth & rute clerk
+    { urlPattern: /^\/(sign-in|sign-up)(\/.*)?$/, handler: 'NetworkOnly' },
+    { urlPattern: /^\/clerk\/.*/, handler: 'NetworkOnly' },
+
+    // rsc/flight, api, image optimizer (aman di-network only)
+    { urlPattern: ({ url }) => url.searchParams && url.searchParams.has('_rsc'), handler: 'NetworkOnly' },
     { urlPattern: /^\/(api|trpc)\//, handler: 'NetworkOnly' },
-    // Next image optimizer
     { urlPattern: /^\/_next\/image/, handler: 'NetworkOnly' },
 
-    // Static chunks
+    // static chunks
     {
       urlPattern: /^\/_next\/static\//,
       handler: 'CacheFirst',
-      options: {
-        cacheName: 'next-static-chunks',
-        expiration: { maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 30 },
-      },
+      options: { cacheName: 'next-static-chunks', expiration: { maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 30 } },
     },
-
-    // Gambar lokal app (opsional)
+    // gambar lokal (opsional)
     {
-      urlPattern: ({ url }) =>
-        url.origin === self.location.origin &&
-        (url.pathname.startsWith('/uploads') || url.pathname.startsWith('/photos')),
+      urlPattern: ({ url }) => url.origin === self.location.origin && (url.pathname.startsWith('/uploads') || url.pathname.startsWith('/photos')),
       handler: 'StaleWhileRevalidate',
-      options: {
-        cacheName: 'app-images',
-        expiration: { maxEntries: 256, maxAgeSeconds: 60 * 60 * 24 * 30 },
-      },
+      options: { cacheName: 'app-images', expiration: { maxEntries: 256, maxAgeSeconds: 60 * 60 * 24 * 30 } },
     },
-
-    // ⬇️ Jangan pernah cache halaman auth & Clerk
-    { urlPattern: /^\/(sign-in|sign-up)(\/.*)?$/, handler: 'NetworkOnly' },
-    { urlPattern: ({ url }) => url.pathname.startsWith('/clerk/'), handler: 'NetworkOnly' },
   ],
-})(nextConfig)
+})(nextConfig);
