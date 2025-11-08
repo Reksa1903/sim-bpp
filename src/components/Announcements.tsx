@@ -1,56 +1,44 @@
 'use client';
 // src/components/Announcements.tsx
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const runtime = 'nodejs';
-
 import { useEffect, useState } from 'react';
+import Announcements from '@/components/Announcements';
+import EventCalendar from '@/components/EventCalendar';
+import BigCalendarContainer from '@/components/BigCalendarContainer';
 
-const Announcements = () => {
-  const [data, setData] = useState<any[]>([]);
+const KelompokTaniPage = () => {
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
-    const apiUrl =
-      process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VERCEL_URL
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/pengumuman`
-        : '/api/pengumuman';
-
-    fetch(apiUrl)
+    fetch('/api/session')
       .then((res) => res.json())
-      .then(setData)
-      .catch(console.error);
+      .then((data) => setRole(data?.role ?? null))
+      .catch(() => setRole(null));
   }, []);
 
-  return (
-    <div className="bg-white p-4 rounded-md">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Pengumuman</h1>
-        <span className="text-xs text-gray-400">Lihat Semua</span>
+  if (role !== 'kelompoktani') {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-red-500 font-semibold">
+          Anda tidak memiliki akses ke halaman ini.
+        </p>
       </div>
-      <div className="flex flex-col gap-4 mt-4">
-        {data.map((item: any, i: number) => (
-          <div
-            key={item.id}
-            className={`rounded-md p-4 ${
-              i === 0
-                ? 'bg-BppLightGreen'
-                : i === 1
-                ? 'bg-BppLightYellow'
-                : 'bg-BppLightBlue'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="font-medium">{item.title}</h2>
-              <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
-                {new Date(item.date).toLocaleDateString('id-ID')}
-              </span>
-            </div>
-            <p className="text-sm text-gray-400 mt-1">{item.description}</p>
-          </div>
-        ))}
+    );
+  }
+
+  return (
+    <div className="flex-1 p-4 flex gap-4 flex-col xl:flex-row">
+      <div className="w-full xl:w-2/3">
+        <div className="h-[1200px] bg-white p-4 rounded-md">
+          <h1 className="text-xl font-semibold mb-4">Jadwal Kegiatan</h1>
+          <BigCalendarContainer />
+        </div>
+      </div>
+      <div className="w-full xl:w-1/3 flex flex-col gap-8">
+        <EventCalendar />
+        <Announcements />
       </div>
     </div>
   );
 };
 
-export default Announcements;
+export default KelompokTaniPage;
