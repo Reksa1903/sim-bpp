@@ -1,4 +1,4 @@
-// FotoKegiatan.tsx
+// src/components/FotoKegiatan.tsx
 import Image from 'next/image';
 
 type FotoKegiatanProps = {

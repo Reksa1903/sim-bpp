@@ -3,12 +3,16 @@ import Announcements from '@/components/Announcements';
 import BigCalendarContainer from '@/components/BigCalendarContainer';
 import FotoKegiatan from '@/components/FotoKegiatan';
 import Performance from '@/components/Performance';
-import prisma from '@/lib/prisma';
+import prisma from '@/lib/prisma'; // ✅ cukup ini saja
 import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import FormContainer from '@/components/FormContainer'; // ✅ Tambahan
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
 
 type CalendarEvent = { title: string; start: Date; end: Date };
 
@@ -17,7 +21,7 @@ const SingleKelompokTaniPage = async ({
 }: {
   params: { id: string };
 }) => {
-  const { default: prisma } = await import('@/lib/prisma');
+  // const { default: prisma } = await import('@/lib/prisma');
 
   // ---- Ambil role untuk hak akses ----
   const { sessionClaims } = await auth();
