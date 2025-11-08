@@ -28,14 +28,14 @@ const BigCalendarContainer = dynamic(
 
 type CalendarEvent = { title: string; start: Date; end: Date };
 
-const SingleKelompokTaniPage = async ({ params: { id } }: { params: { id: string } }) => ({
-  noStore();
-  
+const SingleKelompokTaniPage = async ({ params: { id } }: { params: { id: string } }) => ({  
   params: { id },
 }: {
   params: { id: string };
 }) => {
   // const { default: prisma } = await import('@/lib/prisma');
+    noStore();
+    const { id } = params;
 
   // ---- Ambil role untuk hak akses ----
   const { sessionClaims } = await auth();
