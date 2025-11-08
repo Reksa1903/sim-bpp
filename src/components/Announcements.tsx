@@ -1,34 +1,25 @@
 'use client';
 // src/components/Announcements.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import { useEffect, useState } from 'react';
 
 const Announcements = () => {
   const [data, setData] = useState<any[]>([]);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const baseUrl =
+    const apiUrl =
       process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VERCEL_URL
         ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/pengumuman`
         : '/api/pengumuman';
 
-    fetch(baseUrl)
-      .then((res) => (res.ok ? res.json() : []))
+    fetch(apiUrl)
+      .then((res) => res.json())
       .then(setData)
-      .catch((err) => {
-        console.error('Failed to load pengumuman:', err);
-        setError(true);
-      });
+      .catch(console.error);
   }, []);
-
-  if (error) {
-    return (
-      <div className="bg-white p-4 rounded-md">
-        <h1 className="text-xl font-semibold">Pengumuman</h1>
-        <p className="text-gray-400 mt-2 text-sm">Gagal memuat data.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-white p-4 rounded-md">
@@ -37,9 +28,6 @@ const Announcements = () => {
         <span className="text-xs text-gray-400">Lihat Semua</span>
       </div>
       <div className="flex flex-col gap-4 mt-4">
-        {data.length === 0 && (
-          <p className="text-gray-400 text-sm">Tidak ada pengumuman.</p>
-        )}
         {data.map((item: any, i: number) => (
           <div
             key={item.id}
