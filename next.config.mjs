@@ -1,6 +1,7 @@
 // next.config.mjs
 import withPWA from 'next-pwa';
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -22,29 +23,16 @@ export default withPWA({
   register: true,
   skipWaiting: true,
 
-  // Penting: jangan jadikan _rsc bagian dari cache key precache
-  workboxOptions: {
-    ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^_rsc$/],
-  },
-
-  // Jaga App Router & API: semua ini HARUS ke network
+  // Penting: lindungi request data App Router & API dari SW
   runtimeCaching: [
-    // 1) Data App Router (RSC/Flight)
-    {
-      urlPattern: ({ url }) => url.searchParams.has('_rsc'),
-      handler: 'NetworkOnly',
-    },
-    // 2) API / TRPC
-    {
-      urlPattern: /^\/(api|trpc)\//,
-      handler: 'NetworkOnly',
-    },
-    // 3) Next Image optimizer
-    {
-      urlPattern: /^\/_next\/image/,
-      handler: 'NetworkOnly',
-    },
-    // 4) Static chunks – aman untuk cache
+    // App Router RSC/Flight data
+    { urlPattern: ({ url }) => url.searchParams.has('_rsc'), handler: 'NetworkOnly' },
+    // API / TRPC
+    { urlPattern: /^\/(api|trpc)\//, handler: 'NetworkOnly' },
+    // Next image optimizer
+    { urlPattern: /^\/_next\/image/, handler: 'NetworkOnly' },
+
+    // Static chunks (aman dicache)
     {
       urlPattern: /^\/_next\/static\//,
       handler: 'CacheFirst',
@@ -53,7 +41,8 @@ export default withPWA({
         expiration: { maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 30 },
       },
     },
-    // 5) Gambar app (opsional)
+
+    // Gambar aplikasi (opsional)
     {
       urlPattern: ({ url }) =>
         url.origin === self.location.origin &&
