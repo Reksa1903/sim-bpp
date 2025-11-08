@@ -8,38 +8,48 @@ const matchers = Object.keys(routeAccessMap).map((route) => ({
   allowedRoles: routeAccessMap[route],
 }));
 
-const isAuthPath = (pathname: string) =>
-  pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up');
+const isAuthPath = (p: string) => p.startsWith('/sign-in') || p.startsWith('/sign-up');
 
 export default clerkMiddleware(async (auth, req) => {
   const url = new URL(req.url);
+
+  // 0) BYPASS untuk request RSC/Flight dan aset SW
+  if (
+    url.searchParams.has('_rsc') ||                      // App Router data
+    url.pathname === '/sw.js' ||                        // service worker file
+    /^\/workbox-.*\.js$/.test(url.pathname) ||          // workbox helper
+    url.pathname.startsWith('/_next/') ||               // aset Next
+    /\.[a-zA-Z0-9]+$/.test(url.pathname)                // semua file statik
+  ) {
+    return NextResponse.next();
+  }
+
   const { userId, sessionClaims } = await auth();
   const role = (sessionClaims?.metadata as { role?: string })?.role;
 
-  // Root → biarkan ditangani oleh src/app/page.tsx
-  // (tidak perlu redirect di middleware)
-
-  // Belum login & bukan halaman auth → arahkan ke sign-in
+  // 1) Belum login → redirect ke sign-in (kecuali di halaman auth)
   if (!userId && !isAuthPath(url.pathname)) {
     return NextResponse.redirect(
       new URL(process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in', req.url)
     );
   }
 
-  // Cek ACL berdasarkan routeAccessMap (hanya jika sudah login & punya role)
+  // 2) Cek ACL berbasis peta route
   if (userId && role) {
     for (const { matcher, allowedRoles } of matchers) {
       if (matcher(req) && !allowedRoles.includes(role)) {
-        // unauthorized → arahkan ke dashboard sesuai role
         return NextResponse.redirect(new URL(`/${role}`, req.url));
       }
     }
   }
+
+  return NextResponse.next();
 });
 
+// Matcher sederhana ala Clerk: jangan intercept file statik & _next
 export const config = {
   matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/((?!.*\\..*|_next).*)',
     '/(api|trpc)(.*)',
   ],
 };
