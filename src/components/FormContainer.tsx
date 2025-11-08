@@ -25,7 +25,9 @@ const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
 
   useEffect(() => {
     const fetchRelatedData = async () => {
-      const res = await fetch(`/api/formdata?table=${table}`);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/formdata?table=...`
+      );
       const json = await res.json();
       setRelatedData(json);
     };

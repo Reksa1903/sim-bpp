@@ -2,11 +2,12 @@
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: Request) {
+    try { 
   const { searchParams } = new URL(request.url);
   const table = searchParams.get('table');
   let relatedData: any = {};
@@ -137,6 +138,13 @@ export async function GET(request: Request) {
         break;
     }
 
-  return NextResponse.json(relatedData);
+    return NextResponse.json(relatedData, { status: 200 });
+    } catch (err) {
+        console.error('API /formdata error:', err);
+        return NextResponse.json(
+            { error: 'Internal Server Error' },
+            { status: 500 }
+        );
+    }
 }
 
