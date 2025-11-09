@@ -1,3 +1,4 @@
+// src/app/(dashboard)/admin/_client.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -60,7 +61,7 @@ export default function AdminClient({
         </div>
 
         <div className="w-full h-[500px]">
-          <PanenChart />
+          <PanenChart data={stats.panen ?? []} />
         </div>
       </div>
 
