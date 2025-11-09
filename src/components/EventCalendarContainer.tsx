@@ -1,3 +1,4 @@
+// src/components/EventCalendarContainer.tsx
 import Image from 'next/image';
 import EventCalendar from './EventCalendar';
 import EventList from './EventList';

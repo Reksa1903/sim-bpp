@@ -1,3 +1,4 @@
+// src/components/EventList.tsx
 import prisma from '@/lib/prisma';
 
 const EventList = async ({ dateParam }: { dateParam: string | undefined }) => {

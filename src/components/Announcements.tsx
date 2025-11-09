@@ -1,6 +1,5 @@
 'use client';
 // src/components/Announcements.tsx
-
 import { useEffect, useState } from 'react';
 
 const Announcements = () => {
@@ -44,13 +43,12 @@ const Announcements = () => {
         {data.map((item: any, i: number) => (
           <div
             key={item.id}
-            className={`rounded-md p-4 ${
-              i === 0
+            className={`rounded-md p-4 ${i === 0
                 ? 'bg-BppLightGreen'
                 : i === 1
-                ? 'bg-BppLightYellow'
-                : 'bg-BppLightBlue'
-            }`}
+                  ? 'bg-BppLightYellow'
+                  : 'bg-BppLightBlue'
+              }`}
           >
             <div className="flex items-center justify-between">
               <h2 className="font-medium">{item.title}</h2>

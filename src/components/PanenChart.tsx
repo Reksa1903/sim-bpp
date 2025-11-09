@@ -1,3 +1,4 @@
+// src/components/PanenChart.tsx
 'use client';
 
 import Image from 'next/image';
