@@ -72,12 +72,46 @@ export default function AdminClient() {
           <div className="flex justify-between items-center mb-2">
             <h1 className="text-lg font-semibold">Keanggotaan</h1>
           </div>
+
           <div className="flex-1 min-h-0">
             <CountChart
               Kelompok_Tani={stats.kelompokTani ?? 0}
               Kios_Pertanian={stats.kiosPertanian ?? 0}
             />
           </div>
+
+          {/* ⬇️ Legend & persentase */}
+          {(() => {
+            const kelompok = stats.kelompokTani ?? 0;
+            const kios = stats.kiosPertanian ?? 0;
+            const total = kelompok + kios || 1;
+            const kelompokPct = Math.round((kelompok / total) * 100);
+            const kiosPct = Math.round((kios / total) * 100);
+
+            return (
+              <div className="flex justify-center gap-8 mt-4">
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-BppGreen rounded-full" />
+                    <span className="font-bold">{kelompok}</span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Kelompok Tani ({kelompokPct}%)
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-BppYellow rounded-full" />
+                    <span className="font-bold">{kios}</span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Kios Pertanian ({kiosPct}%)
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* ActivityChart card */}
