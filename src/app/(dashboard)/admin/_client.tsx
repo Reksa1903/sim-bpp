@@ -48,7 +48,7 @@ export default function AdminClient() {
       </div>
 
       <div className="w-full h-[500px]">
-        <PanenChart data={stats.panen ?? []} />
+        <PanenChart data={stats.panenMonthly ?? undefined} />
       </div>
     </div>
   );
