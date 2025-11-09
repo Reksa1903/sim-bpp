@@ -36,7 +36,7 @@ const nextConfig = {
 // PWA (tetap boleh)
 export default withPWA({
   dest: 'public',
-  disable: isDev,
+  disable: true,
   register: true,
   skipWaiting: true,
   runtimeCaching: [
