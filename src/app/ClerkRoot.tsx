@@ -19,7 +19,6 @@ export default function ClerkRoot({ children }: { children: React.ReactNode }) {
       signUpUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up'}
       afterSignInUrl="/admin"
       afterSignUpUrl="/admin"
-      proxyUrl="/clerk"
     >
       {children}
       <ToastContainer position="bottom-right" theme="dark" />
