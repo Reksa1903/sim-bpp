@@ -12,34 +12,41 @@ const isAuthPath = (p: string) => p.startsWith('/sign-in') || p.startsWith('/sig
 
 export default clerkMiddleware(async (auth, req) => {
   const url = new URL(req.url);
+  const h = req.headers;
 
-  // BYPASS: RSC/Flight, SW assets, Next assets, static files, dan **jalur proxy Clerk**
-  if (
+  // ⬇️ Bypass RSC/Flight (pakai query ATAU header), aset Next, file statik, dan proxy Clerk
+  const isRSC =
     url.searchParams.has('_rsc') ||
+    h.has('rsc') ||
+    h.has('next-router-state-tree') ||
+    h.get('next-router-prefetch') === '1' ||
+    h.get('purpose') === 'prefetch';
+
+  const isAsset =
     url.pathname === '/sw.js' ||
     /^\/workbox-.*\.js$/.test(url.pathname) ||
     url.pathname.startsWith('/_next/') ||
-    url.pathname.startsWith('/clerk/') || // <— penting: jangan intercept proxy Clerk
-    /\.[a-zA-Z0-9]+$/.test(url.pathname)
-  ) {
+    url.pathname.startsWith('/clerk/') ||
+    /\.[a-zA-Z0-9]+$/.test(url.pathname);
+
+  if (isRSC || isAsset) {
     return NextResponse.next();
   }
 
   const { userId, sessionClaims } = await auth();
-
-  // Dev instance kadang taruh role di publicMetadata
   const role =
     (sessionClaims?.metadata as { role?: string })?.role ??
-    (sessionClaims?.publicMetadata as { role?: string })?.role ?? null;
+    (sessionClaims?.publicMetadata as { role?: string })?.role ??
+    null;
 
-  // Belum login → arahkan ke sign-in (kecuali di halaman auth)
+  // Belum login → redirect ke sign-in (kecuali halaman auth)
   if (!userId && !isAuthPath(url.pathname)) {
     return NextResponse.redirect(
-      new URL(process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in', req.url)
+      new URL(process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in', req.url),
     );
   }
 
-  // Cek ACL berbasis peta route
+  // Cek ACL (hanya jika sudah login & punya role)
   if (userId && role) {
     for (const { matcher, allowedRoles } of matchers) {
       if (matcher(req) && !allowedRoles.includes(role)) {
@@ -51,11 +58,10 @@ export default clerkMiddleware(async (auth, req) => {
   return NextResponse.next();
 });
 
-// Matcher: selain static & _next, **opsional** sekalian exclude /clerk dari intercept
+// Jangan intercept static, _next, proxy clerk, dan auth routes
 export const config = {
   matcher: [
     '/((?!.*\\..*|_next|clerk|sign-in|sign-up).*)',
     '/(api|trpc)(.*)',
   ],
 };
-
