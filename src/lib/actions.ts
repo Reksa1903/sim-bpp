@@ -8,70 +8,94 @@ import path from "path";
 import fs from 'fs';
 import { v4 as uuidv4 } from "uuid";
 import { clerkClient } from "@clerk/nextjs/server";
-
+import { cloudinary } from "@/lib/cloudinary";
 
 // Tipe respons form
-type FormResult = { success: boolean; error: boolean };
+export type FormResult = {
+  success: boolean;
+  error: boolean;
+  message?: string | null;
+};
 
 // === Materi === //
 export const createMateriFromForm = async (formData: FormData): Promise<FormResult> => {
   try {
-    const title = formData.get("title") as string;
+    const title = (formData.get("title") as string || "").trim();
     const penyuluhId = formData.get("penyuluhId") as string;
-    const fileName = formData.get("fileName") as string;
-    const file = formData.get("file") as File;
+    const fileName = (formData.get("fileName") as string || "").trim();
+    const file = formData.get("file") as File | null;
 
-    if (!file || file.size === 0) throw new Error("File tidak valid");
+    if (!title || !penyuluhId || !file || file.size === 0) {
+      return { success: false, error: true, message: "Field belum lengkap / file kosong" };
+    }
+    if (!file.type.includes("pdf")) {
+      return { success: false, error: true, message: "Hanya PDF yang diizinkan" };
+    }
 
+    // File -> Buffer
     const buffer = Buffer.from(await file.arrayBuffer());
-    const uniqueFile = `${uuidv4()}-${file.name}`;
-    const filePath = path.join(process.cwd(), "public/uploads", uniqueFile);
-    await writeFile(filePath, buffer);
 
-    const fileUrl = `/uploads/${uniqueFile}`;
+    // Upload ke Cloudinary sebagai RAW (PDF)
+    const publicIdBase = `${uuidv4()}-${(fileName || file.name).replace(/\.[^.]+$/,'')}`;
+    const uploaded = await new Promise<any>((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          folder: "sim-bpp/materi",
+          resource_type: "raw",
+          public_id: publicIdBase,
+          overwrite: true,
+        },
+        (err, res) => (err || !res ? reject(err) : resolve(res))
+      ).end(buffer);
+    });
 
     await prisma.materi.create({
       data: {
         title,
         penyuluhId,
-        fileName,
-        fileUrl,
+        fileName: fileName || uploaded.original_filename || file.name,
+        fileUrl: uploaded.secure_url, // ← simpan URL
+        // kalau model kalian ada uploadDate/updateDate pakai default di Prisma
       },
     });
 
     return { success: true, error: false };
-  } catch (error) {
-    console.error("Create Error:", error);
-    return { success: false, error: true };
+  } catch (e) {
+    console.error("createMateriFromForm failed:", e);
+    return { success: false, error: true, message: "Gagal menyimpan data di server" };
   }
 };
 
+// --- UPDATE ---
 export const updateMateriFromForm = async (formData: FormData): Promise<FormResult> => {
   try {
     const id = formData.get("id") as string;
-    const title = formData.get("title") as string;
+    const title = (formData.get("title") as string || "").trim();
     const penyuluhId = formData.get("penyuluhId") as string;
-    const fileName = formData.get("fileName") as string;
-    const file = formData.get("file") as File;
+    const fileName = (formData.get("fileName") as string || "").trim();
+    const file = formData.get("file") as File | null;
 
     let fileUrl: string | undefined;
 
     if (file && file.size > 0) {
-      const existing = await prisma.materi.findUnique({ where: { id } });
-      if (existing?.fileUrl) {
-        const oldPath = path.join(process.cwd(), "public", existing.fileUrl);
-        try {
-          await unlink(oldPath);
-        } catch (err) {
-          console.warn("File lama tidak ditemukan:", err);
-        }
-      }
-
       const buffer = Buffer.from(await file.arrayBuffer());
-      const uniqueFile = `${uuidv4()}-${file.name}`;
-      const filePath = path.join(process.cwd(), "public/uploads", uniqueFile);
-      await writeFile(filePath, buffer);
-      fileUrl = `/uploads/${uniqueFile}`;
+      const publicIdBase = `${uuidv4()}-${(fileName || file.name).replace(/\.[^.]+$/,'')}`;
+
+      const uploaded = await new Promise<any>((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          {
+            folder: "sim-bpp/materi",
+            resource_type: "raw",
+            public_id: publicIdBase,
+            overwrite: true,
+          },
+          (err, res) => (err || !res ? reject(err) : resolve(res))
+        ).end(buffer);
+      });
+
+      fileUrl = uploaded.secure_url;
+      // (Opsional) kalau mau rapih, simpan juga uploaded.public_id ke kolom DB agar
+      // bisa dihapus saat delete. Untuk sekarang bisa dilewati.
     }
 
     await prisma.materi.update({
@@ -79,39 +103,28 @@ export const updateMateriFromForm = async (formData: FormData): Promise<FormResu
       data: {
         title,
         penyuluhId,
-        fileName,
+        fileName: fileName || undefined,
         ...(fileUrl && { fileUrl }),
       },
     });
 
     return { success: true, error: false };
-  } catch (error) {
-    console.error("Update Error:", error);
-    return { success: false, error: true };
+  } catch (e) {
+    console.error("updateMateriFromForm failed:", e);
+    return { success: false, error: true, message: "Gagal menyimpan data di server" };
   }
 };
 
-export const deleteMateri = async (
-  _currentState: FormResult,
-  formData: FormData
-): Promise<FormResult> => {
+// --- DELETE ---
+// Sementara hapus record saja. Jika kamu simpan `public_id`,
+// kamu bisa panggil `cloudinary.uploader.destroy(public_id, { resource_type: "raw" })`.
+export const deleteMateri = async (_: FormResult, formData: FormData): Promise<FormResult> => {
   try {
     const id = formData.get("id") as string;
-    const existing = await prisma.materi.findUnique({ where: { id } });
-    if (existing?.fileUrl) {
-      const filePath = path.join(process.cwd(), "public", existing.fileUrl);
-      try {
-        await unlink(filePath);
-      } catch (err) {
-        console.warn("Gagal menghapus file:", err);
-      }
-    }
-
     await prisma.materi.delete({ where: { id } });
-
     return { success: true, error: false };
-  } catch (error) {
-    console.error("Delete Error:", error);
+  } catch (e) {
+    console.error("deleteMateri failed:", e);
     return { success: false, error: true };
   }
 };
@@ -125,28 +138,32 @@ export const createPengumumanFromForm = async (formData: FormData): Promise<Form
     const kelompokTaniId = (formData.get("kelompokTaniId") as string) || null;
     const desaBinaanId = (formData.get("desaBinaanId") as string) || null;
 
-    // Validasi minimal
     if (!title || !description) {
-      return { success: false, error: true };
+      return { success: false, error: true, message: "Judul & deskripsi wajib diisi." };
     }
 
     await prisma.pengumuman.create({
       data: {
         title,
         description,
-        penyuluhId: penyuluhId === "" ? null : penyuluhId,
-        kelompokTaniId: kelompokTaniId === "" ? null : kelompokTaniId,
-        desaBinaanId: desaBinaanId === "" ? null : desaBinaanId,
+        penyuluhId: penyuluhId || null,
+        kelompokTaniId: kelompokTaniId || null,
+        desaBinaanId: desaBinaanId || null,
       },
     });
 
-    return { success: true, error: false };
-  } catch (error) {
+    // Segarkan halaman terkait
+    revalidatePath("/list/pengumuman");
+    revalidatePath("/admin");
+
+    return { success: true, error: false, message: null };
+  } catch (error: any) {
     console.error("Create Pengumuman Error:", error);
-    return { success: false, error: true };
+    return { success: false, error: true, message: error?.message || "Gagal membuat pengumuman." };
   }
 };
 
+// UPDATE
 export const updatePengumumanFromForm = async (formData: FormData): Promise<FormResult> => {
   try {
     const id = formData.get("id") as string;
@@ -157,7 +174,7 @@ export const updatePengumumanFromForm = async (formData: FormData): Promise<Form
     const desaBinaanId = (formData.get("desaBinaanId") as string) || null;
 
     if (!id || !title || !description) {
-      return { success: false, error: true };
+      return { success: false, error: true, message: "Data tidak lengkap." };
     }
 
     await prisma.pengumuman.update({
@@ -165,38 +182,39 @@ export const updatePengumumanFromForm = async (formData: FormData): Promise<Form
       data: {
         title,
         description,
-        penyuluhId: penyuluhId === "" ? null : penyuluhId,
-        kelompokTaniId: kelompokTaniId === "" ? null : kelompokTaniId,
-        desaBinaanId: desaBinaanId === "" ? null : desaBinaanId,
+        penyuluhId: penyuluhId || null,
+        kelompokTaniId: kelompokTaniId || null,
+        desaBinaanId: desaBinaanId || null,
       },
     });
 
-    return { success: true, error: false };
-  } catch (error) {
+    revalidatePath("/list/pengumuman");
+    revalidatePath("/admin");
+
+    return { success: true, error: false, message: null };
+  } catch (error: any) {
     console.error("Update Pengumuman Error:", error);
-    return { success: false, error: true };
+    return { success: false, error: true, message: error?.message || "Gagal mengubah pengumuman." };
   }
 };
 
-export const deletePengumuman = async (
-  _currentState: FormResult,
-  formData: FormData
-): Promise<FormResult> => {
+// DELETE
+export const deletePengumuman = async (_: FormResult, formData: FormData): Promise<FormResult> => {
   try {
     const id = formData.get("id") as string;
-    if (!id) {
-      return { success: false, error: true };
-    }
+    if (!id) return { success: false, error: true, message: "ID tidak ditemukan." };
 
     await prisma.pengumuman.delete({ where: { id } });
 
-    return { success: true, error: false };
-  } catch (error) {
+    revalidatePath("/list/pengumuman");
+    revalidatePath("/admin");
+
+    return { success: true, error: false, message: null };
+  } catch (error: any) {
     console.error("Delete Pengumuman Error:", error);
-    return { success: false, error: true };
+    return { success: false, error: true, message: error?.message || "Gagal menghapus pengumuman." };
   }
 };
-
 
 // === Kegiatan === //
 export const createKegiatanFromForm = async (formData: FormData): Promise<FormResult> => {
