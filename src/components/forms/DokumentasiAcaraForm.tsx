@@ -57,8 +57,8 @@ const DokumentasiAcaraForm = ({
     type === 'create'
       ? createAction
       : type === 'update'
-      ? updateAction
-      : deleteAction,
+        ? updateAction
+        : deleteAction,
     { success: false, error: false }
   );
 
@@ -72,8 +72,7 @@ const DokumentasiAcaraForm = ({
         toast.success('Dokumentasi acara berhasil dihapus!');
       } else {
         toast.success(
-          `Dokumentasi acara berhasil ${
-            type === 'create' ? 'ditambahkan' : 'diubah'
+          `Dokumentasi acara berhasil ${type === 'create' ? 'ditambahkan' : 'diubah'
           }!`
         );
       }

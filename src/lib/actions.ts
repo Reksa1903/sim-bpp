@@ -289,86 +289,100 @@ export const deleteKegiatan = async (
 };
 
 // === DokumentasiAcara === //
+// CREATE
 export const createDokumentasiAcaraFromForm = async (formData: FormData): Promise<FormResult> => {
   try {
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const date = new Date(formData.get("date") as string);
-    const penyuluhId = formData.get("penyuluhId") as string;
-    const photo = formData.get("photo") as File;
+    const title = (formData.get("title") as string || "").trim();
+    const description = (formData.get("description") as string || "").trim();
+    const dateStr = formData.get("date") as string | null;        // "YYYY-MM-DD"
+    const penyuluhId = formData.get("penyuluhId") as string | null;
+    const photo = formData.get("photo") as File | null;           // ← name input = "photo"
 
-    if (!photo || photo.size === 0) {
-      throw new Error("Foto dokumentasi tidak valid");
+    if (!title || !description || !photo || photo.size === 0) {
+      return { success: false, error: true, message: "Data belum lengkap / foto kosong" };
     }
 
     const buffer = Buffer.from(await photo.arrayBuffer());
-    const uniqueFile = `${uuidv4()}-${photo.name}`;
-    const filePath = path.join(process.cwd(), "public/photos", uniqueFile);
-    await writeFile(filePath, buffer);
 
-    const photoUrl = `/photos/${uniqueFile}`;
+    const uploaded: any = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "sim-bpp/dokumentasi",
+            resource_type: "image",
+            public_id: `${uuidv4()}-${(photo.name || "photo").replace(/\.[^.]+$/,"")}`,
+            overwrite: true,
+          },
+          (err, res) => (err || !res ? reject(err) : resolve(res))
+        )
+        .end(buffer);
+    });
 
     await prisma.dokumentasiAcara.create({
       data: {
         title,
         description,
-        date,
-        penyuluhId,
-        photo: photoUrl,
+        date: dateStr ? new Date(`${dateStr}T00:00:00.000Z`) : new Date(),
+        ...(penyuluhId ? { penyuluhId } : {}),
+        photo: uploaded.secure_url,           // simpan URL Cloudinary
       },
     });
 
-    return { success: true, error: false };
-  } catch (error) {
-    console.error("Create Dokumentasi Error:", error);
-    return { success: false, error: true };
+    revalidatePath("/list/dokumentasiacara");
+    revalidatePath("/admin");
+    return { success: true, error: false, message: null };
+  } catch (e: any) {
+    console.error("Create Dokumentasi Error:", e);
+    return { success: false, error: true, message: e?.message || "Upload gagal" };
   }
 };
 
+// UPDATE
 export const updateDokumentasiAcaraFromForm = async (formData: FormData): Promise<FormResult> => {
   try {
     const id = formData.get("id") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const date = new Date(formData.get("date") as string);
-    const penyuluhId = formData.get("penyuluhId") as string;
-    const photo = formData.get("photo") as File;
+    const title = (formData.get("title") as string || "").trim();
+    const description = (formData.get("description") as string || "").trim();
+    const dateStr = formData.get("date") as string | null;
+    const penyuluhId = formData.get("penyuluhId") as string | null;
+    const photo = formData.get("photo") as File | null;
 
-    let photoUrl: string | undefined;
-
-    if (photo && photo.size > 0) {
-      const existing = await prisma.dokumentasiAcara.findUnique({ where: { id } });
-      if (existing?.photo) {
-        const oldPath = path.join(process.cwd(), "public", existing.photo);
-        try {
-          await unlink(oldPath);
-        } catch (err) {
-          console.warn("Foto lama tidak ditemukan:", err);
-        }
-      }
-
-      const buffer = Buffer.from(await photo.arrayBuffer());
-      const uniqueFile = `${uuidv4()}-${photo.name}`;
-      const filePath = path.join(process.cwd(), "public/photos", uniqueFile);
-      await writeFile(filePath, buffer);
-      photoUrl = `/photos/${uniqueFile}`;
+    if (!id || !title || !description) {
+      return { success: false, error: true, message: "Data tidak lengkap" };
     }
 
-    await prisma.dokumentasiAcara.update({
-      where: { id },
-      data: {
-        title,
-        description,
-        date,
-        penyuluhId,
-        ...(photoUrl && { photo: photoUrl }),
-      },
-    });
+    const patch: any = {
+      title, description,
+      ...(dateStr ? { date: new Date(`${dateStr}T00:00:00.000Z`) } : {}),
+      ...(penyuluhId ? { penyuluhId } : {}),
+    };
 
-    return { success: true, error: false };
-  } catch (error) {
-    console.error("Update Dokumentasi Error:", error);
-    return { success: false, error: true };
+    if (photo && photo.size > 0) {
+      const buffer = Buffer.from(await photo.arrayBuffer());
+      const uploaded: any = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            {
+              folder: "sim-bpp/dokumentasi",
+              resource_type: "image",
+              public_id: `${uuidv4()}-${(photo.name || "photo").replace(/\.[^.]+$/,"")}`,
+              overwrite: true,
+            },
+            (err, res) => (err || !res ? reject(err) : resolve(res))
+          )
+          .end(buffer);
+      });
+      patch.photo = uploaded.secure_url;
+    }
+
+    await prisma.dokumentasiAcara.update({ where: { id }, data: patch });
+
+    revalidatePath("/list/dokumentasiacara");
+    revalidatePath("/admin");
+    return { success: true, error: false, message: null };
+  } catch (e: any) {
+    console.error("Update Dokumentasi Error:", e);
+    return { success: false, error: true, message: e?.message || "Update gagal" };
   }
 };
 

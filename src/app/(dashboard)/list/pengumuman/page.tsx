@@ -33,8 +33,6 @@ const PengumumanListPage = async ({
   // 🪄 ambil role dengan helper
   const role = await getRole();
 
-  const { default: prisma } = await import('@/lib/prisma');
-
   const { page, ...queryParams } = searchParams;
   const p = page ? parseInt(page) : 1;
 
