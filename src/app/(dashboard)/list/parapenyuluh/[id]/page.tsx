@@ -1,6 +1,4 @@
 // src/app/(dashboard)/list/parapenyuluh/[id]/page.tsx
-"use client";
-
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 export const revalidate = 0;

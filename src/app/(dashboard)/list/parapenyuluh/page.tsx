@@ -1,10 +1,8 @@
 // src/app/(dashboard)/list/parapenyuluh/page.tsx
-"use client";
-
 import prisma from "@/lib/prisma";
 import { getRole } from "@/lib/utils";
 import { Prisma, DesaBinaan, Penyuluh } from "@prisma/client";
-import ParaPenyuluhClient from "./_client";
+import ParaPenyuluhClient from "./_client"; // Import komponen client
 
 export type PenyuluhWithDesa = Penyuluh & {
   desaBinaan: DesaBinaan[];
