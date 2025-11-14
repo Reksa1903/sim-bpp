@@ -1,19 +1,23 @@
+// src/components/FormContainer.tsx
 'use client';
 
-// ✅ src/components/FormContainer.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import FormModal from './FormModal';
 import { useEffect, useState } from 'react';
 
 export type FormContainerProps = {
   table:
-    | 'penyuluh'
-    | 'kelompoktani'
-    | 'kisopertanian'
-    | 'materi'
-    | 'kegiatan'
-    | 'dokumentasiacara'
-    | 'pengumuman'
-    | 'desabinaan';
+  | 'penyuluh'
+  | 'kelompoktani'
+  | 'kisopertanian'
+  | 'materi'
+  | 'kegiatan'
+  | 'dokumentasiacara'
+  | 'pengumuman'
+  | 'desabinaan';
   type: 'create' | 'update' | 'delete' | 'download';
   data?: any;
   id?: number | string;

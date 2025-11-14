@@ -1,6 +1,10 @@
 // src/components/FormModal.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import {
   deleteDesaBinaan,
   deleteDokumentasiAcaraFromForm,
@@ -11,7 +15,7 @@ import {
   deletePengumuman,
   deletePenyuluh,
 } from '@/lib/actions';
-import dynamic from 'next/dynamic';
+import NextDynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
@@ -31,29 +35,29 @@ const deleteActionMap: Record<string, any> = {
 };
 
 // ===== lazy forms =====
-const PenyuluhForm = dynamic(() => import('./forms/PenyuluhForm'), {
+const PenyuluhForm = NextDynamic(() => import('./forms/PenyuluhForm'), {
   loading: () => <h1>Loading...</h1>,
 });
-const KelompokTaniForm = dynamic(() => import('./forms/KelompokTaniForm'), {
+const KelompokTaniForm = NextDynamic(() => import('./forms/KelompokTaniForm'), {
   loading: () => <h1>Loading...</h1>,
 });
-const DesaBinaanForm = dynamic(() => import('./forms/DesaBinaanForm'), {
+const DesaBinaanForm = NextDynamic(() => import('./forms/DesaBinaanForm'), {
   loading: () => <h1>Loading...</h1>,
 });
-const KiosPertanianForm = dynamic(() => import('./forms/KiosPertanianForm'), {
+const KiosPertanianForm = NextDynamic(() => import('./forms/KiosPertanianForm'), {
   loading: () => <h1>Loading...</h1>,
 });
-const MateriForm = dynamic(() => import('./forms/MateriForm'), {
+const MateriForm = NextDynamic(() => import('./forms/MateriForm'), {
   loading: () => <h1>Loading...</h1>,
 });
-const KegiatanForm = dynamic(() => import('./forms/KegiatanForm'), {
+const KegiatanForm = NextDynamic(() => import('./forms/KegiatanForm'), {
   loading: () => <h1>Loading...</h1>,
 });
-const DokumentasiAcaraForm = dynamic(
+const DokumentasiAcaraForm = NextDynamic(
   () => import('./forms/DokumentasiAcaraForm'),
   { loading: () => <h1>Loading...</h1> }
 );
-const PengumumanForm = dynamic(() => import('./forms/PengumumanForm'), {
+const PengumumanForm = NextDynamic(() => import('./forms/PengumumanForm'), {
   loading: () => <h1>Loading...</h1>,
 });
 
@@ -140,10 +144,10 @@ const FormModal = ({
     type === 'create'
       ? 'bg-BppYellow'
       : type === 'update'
-      ? 'bg-BppGreen'
-      : type === 'delete'
-      ? 'bg-BppBlue'
-      : 'bg-BppPurple';
+        ? 'bg-BppGreen'
+        : type === 'delete'
+          ? 'bg-BppBlue'
+          : 'bg-BppPurple';
 
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
