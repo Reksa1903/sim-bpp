@@ -1,4 +1,6 @@
 // src/app/(dashboard)/list/parapenyuluh/_client.tsx
+"use client";
+
 import { PenyuluhWithDesa } from './page';
 import Table from '@/components/Table';
 import Pagination from '@/components/Pagination';
