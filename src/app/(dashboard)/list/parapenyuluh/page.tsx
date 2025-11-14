@@ -4,6 +4,11 @@ import { getRole } from "@/lib/utils";
 import { Prisma, DesaBinaan, Penyuluh } from "@prisma/client";
 import ParaPenyuluhClient from "./_client"; // Import komponen client
 
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 export type PenyuluhWithDesa = Penyuluh & {
   desaBinaan: DesaBinaan[];
 };

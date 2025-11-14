@@ -5,7 +5,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   swcMinify: true,
   compiler: { removeConsole: process.env.NODE_ENV !== 'development' },
   images: {
