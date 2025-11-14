@@ -33,7 +33,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "build/types/**/*.ts"
-  ],
+, "src/app/(dashboard)/list/parapenyuluh/_client.__tsx"  ],
   "exclude": [
     "node_modules"
   ]
