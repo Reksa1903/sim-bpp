@@ -8,8 +8,7 @@ export type PenyuluhWithDesa = Penyuluh & {
   desaBinaan: DesaBinaan[];
 };
 
-
-export const ParaPenyuluhListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
+const ParaPenyuluhListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
   const role = (await getRole()) || 'guest';
   const { page, ...queryParams } = searchParams;
   const p = page ? parseInt(page) : 1;
@@ -32,3 +31,6 @@ export const ParaPenyuluhListPage = async ({ searchParams }: { searchParams: { [
 
   return <ParaPenyuluhClient data={data} count={count} role={role} />;
 };
+
+// Ubah menjadi ekspor default
+export default ParaPenyuluhListPage;

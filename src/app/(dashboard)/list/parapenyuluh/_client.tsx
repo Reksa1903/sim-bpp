@@ -13,11 +13,31 @@ interface Props {
 const ParaPenyuluhClient = ({ data, count, role }: Props) => {
   const columns = [
     { header: 'Info', accessor: 'info' },
-    { header: 'Penyuluh ID', accessor: 'penyuluhId' },
-    { header: 'Bidang', accessor: 'bidang' },
-    { header: 'Desa Binaan', accessor: 'desaBinaan' },
-    { header: 'Nomor Hp', accessor: 'phone' },
-    { header: 'Alamat', accessor: 'address' },
+    {
+      header: 'Penyuluh ID',
+      accessor: 'penyuluhId',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Bidang',
+      accessor: 'bidang',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Desa Binaan',
+      accessor: 'desaBinaan',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Nomor Hp',
+      accessor: 'phone',
+      className: 'hidden lg:table-cell',
+    },
+    {
+      header: 'Alamat',
+      accessor: 'address',
+      className: 'hidden lg:table-cell',
+    },
     { header: 'Aksi', accessor: 'actions' },
   ];
 
