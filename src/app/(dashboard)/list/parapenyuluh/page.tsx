@@ -2,13 +2,13 @@
 import prisma from "@/lib/prisma";
 import { getRole } from "@/lib/utils";
 import { Prisma, DesaBinaan, Penyuluh } from "@prisma/client";
-import ParaPenyuluhClient from "./_client"; // Import komponen client
+import ParaPenyuluhClient from "./_client";
 
 export type PenyuluhWithDesa = Penyuluh & {
   desaBinaan: DesaBinaan[];
 };
 
-export const ParaPenyuluhListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
+const ParaPenyuluhListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
   const role = (await getRole()) || 'guest';
   const { page, ...queryParams } = searchParams;
   const p = page ? parseInt(page) : 1;
@@ -29,7 +29,6 @@ export const ParaPenyuluhListPage = async ({ searchParams }: { searchParams: { [
     prisma.penyuluh.count({ where: query }),
   ]);
 
-  // Kirim data dan role ke komponen _client.tsx
   return <ParaPenyuluhClient data={data} count={count} role={role} />;
 };
 
