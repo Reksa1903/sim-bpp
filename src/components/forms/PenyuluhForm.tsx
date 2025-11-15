@@ -1,5 +1,5 @@
 // src/components/forms/PenyuluhForm.tsx
-'use client';
+
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -77,8 +77,8 @@ const PenyuluhForm = ({
       const desaIds = Array.isArray((formValues as any).desaBinaanIds)
         ? (formValues as any).desaBinaanIds
         : (formValues as any).desaBinaanIds
-        ? [(formValues as any).desaBinaanIds]
-        : [];
+          ? [(formValues as any).desaBinaanIds]
+          : [];
 
       // Jika password kosong, JANGAN kirim supaya tidak diubah
       const trimmedPwd = (formValues.password ?? '').trim();
