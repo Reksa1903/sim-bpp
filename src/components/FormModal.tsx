@@ -38,7 +38,10 @@ const deleteActionMap: Record<string, any> = {
 // ===== lazy forms =====
 const PenyuluhForm = NextDynamic(() => import('./forms/PenyuluhForm'), {
   loading: () => <h1>Loading...</h1>,
+  ssr: false,
 });
+console.log("PenyuluhForm loaded:", PenyuluhForm);
+
 const KelompokTaniForm = NextDynamic(() => import('./forms/KelompokTaniForm'), {
   loading: () => <h1>Loading...</h1>,
 });
@@ -153,6 +156,8 @@ const FormModal = ({
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const router = useRouter();
+
+  console.log("Modal Open:", open);
 
   const deleteAction = useMemo(() => deleteActionMap[table], [table]);
 
