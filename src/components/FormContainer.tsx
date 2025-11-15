@@ -27,9 +27,8 @@ export type FormContainerProps = {
 
 const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
   const [relatedData, setRelatedData] = useState<any>({});
-
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRelatedData = async () => {
@@ -38,9 +37,14 @@ const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
         if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
         const json = await res.json();
         setRelatedData(json);
-      } catch (err) {
-        setError(err.message);
-        console.error('❌ Error fetching form data:', err);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+          console.error('❌ Error fetching form data:', err);
+        } else {
+          setError("An unknown error occurred");
+          console.error("❌ Unknown error:", err);
+        }
       } finally {
         setLoading(false);
       }
