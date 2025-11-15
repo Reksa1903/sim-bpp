@@ -34,14 +34,24 @@ const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
         const res = await fetch(`/api/formdata?table=${table}`);
         if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
         const json = await res.json();
+        console.log("Fetched relatedData:", json);  // Cek data yang diterima
         setRelatedData(json);
-      } catch (err) {
-        console.error('❌ Error fetching form data:', err);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+          console.error('❌ Error fetching form data:', err);
+        } else {
+          setError("An unknown error occurred");
+          console.error("❌ Unknown error:", err);
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
     if (type !== 'delete') fetchRelatedData();
   }, [table, type]);
+
 
   return (
     <FormModal
@@ -56,3 +66,11 @@ const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
 };
 
 export default FormContainer;
+function setError(message: string) {
+  throw new Error('Function not implemented.');
+}
+
+function setLoading(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+
