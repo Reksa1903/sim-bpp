@@ -1,12 +1,7 @@
 // src/app/(dashboard)/list/parapenyuluh/_client.tsx
 "use client";
 
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-export const revalidate = 0;
-export const runtime = 'nodejs';
-
-import { PenyuluhWithDesa } from './page';
+import { PenyuluhWithDesa } from './types';
 import Table from '@/components/Table';
 import Pagination from '@/components/Pagination';
 import FormContainer from '@/components/FormContainer';
