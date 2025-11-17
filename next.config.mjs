@@ -1,5 +1,6 @@
 // next.config.mjs
-import { withPWA } from 'next-pwa';
+import pkg from 'next-pwa';
+const withPWA = pkg.default ?? pkg;
 
 const nextConfig = {
   reactStrictMode: true,
@@ -16,7 +17,6 @@ const nextConfig = {
     domains: ['res.cloudinary.com'],
   },
 
-  // Clerk rewrites tetap
   async rewrites() {
     const api = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API;
     if (!api) return [];
@@ -30,7 +30,7 @@ const nextConfig = {
   },
 };
 
-// PWA untuk Next.js App Router (config SIMPLE & COMPATIBLE)
+// PWA wrapper — simple version (works with App Router)
 export default withPWA({
   dest: 'public',
   register: true,
