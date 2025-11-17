@@ -7,7 +7,7 @@ export const revalidate = 0;
 export const runtime = 'nodejs';
 
 import FormModal from './FormModal';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export type FormContainerProps = {
   table:
@@ -27,6 +27,9 @@ export type FormContainerProps = {
 
 const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
   const [relatedData, setRelatedData] = useState<any>({});
+
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchRelatedData = async () => {
@@ -66,11 +69,5 @@ const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
 };
 
 export default FormContainer;
-function setError(message: string) {
-  throw new Error('Function not implemented.');
-}
 
-function setLoading(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}
 
