@@ -32,7 +32,7 @@ export const viewport: Viewport = {
 };
 
 // ⬇️ Import client wrapper tanpa SSR
-const ClerkRoot = NextDynamic(() => import('./ClerkRoot'), { ssr: false });
+import ClerkRoot from './ClerkRoot';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

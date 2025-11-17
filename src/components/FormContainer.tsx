@@ -27,31 +27,33 @@ export type FormContainerProps = {
 
 const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
   const [relatedData, setRelatedData] = useState<any>({});
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRelatedData = async () => {
       try {
         const res = await fetch(`/api/formdata?table=${table}`);
         if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
         const json = await res.json();
-        console.log("Fetched relatedData:", json);  // Cek data yang diterima
         setRelatedData(json);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-          console.error('❌ Error fetching form data:', err);
-        } else {
-          setError("An unknown error occurred");
-          console.error("❌ Unknown error:", err);
-        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
     };
 
-    if (type !== 'delete') fetchRelatedData();
+    if (type !== 'delete') {
+      fetchRelatedData();
+    } else {
+      setLoading(false); // delete mode doesn't need relatedData
+    }
   }, [table, type]);
 
+  if (loading) return null;
+  if (error) return null;
 
   return (
     <FormModal
@@ -66,11 +68,3 @@ const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
 };
 
 export default FormContainer;
-function setError(message: string) {
-  throw new Error('Function not implemented.');
-}
-
-function setLoading(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}
-

@@ -7,21 +7,27 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
 type ValuePiece = Date | null;
-
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const EventCalendar = () => {
-  const [value, onChange] = useState<Value>(new Date());
-
+  const [value, setValue] = useState<Value>(new Date());
   const router = useRouter();
 
-  useEffect(() => {
-    if (value instanceof Date) {
-      router.push(`?date=${value.toLocaleDateString('en-US')}`);
-    }
-  }, [value, router]);
+  const handleChange = (nextValue: Value) => {
+    setValue(nextValue);
 
-  return <Calendar onChange={onChange} value={value} />;
+    if (nextValue instanceof Date) {
+      router.push(`?date=${nextValue.toLocaleDateString('en-US')}`);
+    }
+  };
+
+  return (
+    <Calendar
+      onChange={handleChange}
+      value={value}
+      locale="id-ID"
+    />
+  );
 };
 
 export default EventCalendar;
