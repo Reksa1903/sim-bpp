@@ -1,24 +1,14 @@
-// src/components/FormContainer.tsx
 'use client';
 
 export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-export const revalidate = 0;
-export const runtime = 'nodejs';
 
 import FormModal from './FormModal';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import type { TableName } from './forms/tableRegistry';
 
+// === DEFINE TYPES HERE ===
 export type FormContainerProps = {
-  table:
-  | 'penyuluh'
-  | 'kelompoktani'
-  | 'kiospertanian'
-  | 'materi'
-  | 'kegiatan'
-  | 'dokumentasiacara'
-  | 'pengumuman'
-  | 'desabinaan';
+  table: TableName;
   type: 'create' | 'update' | 'delete' | 'download';
   data?: any;
   id?: number | string;
@@ -26,27 +16,20 @@ export type FormContainerProps = {
 };
 
 const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
-  const [relatedData, setRelatedData] = useState<any>({});
-
+  const [relatedData, setRelatedData] = useState({});
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRelatedData = async () => {
       try {
         const res = await fetch(`/api/formdata?table=${table}`);
         if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
         const json = await res.json();
-        console.log("Fetched relatedData:", json);  // Cek data yang diterima
         setRelatedData(json);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-          console.error('❌ Error fetching form data:', err);
-        } else {
-          setError("An unknown error occurred");
-          console.error("❌ Unknown error:", err);
-        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {
         setLoading(false);
       }
@@ -55,6 +38,8 @@ const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
     if (type !== 'delete') fetchRelatedData();
   }, [table, type]);
 
+  if (loading) return null;
+  if (error) return null;
 
   return (
     <FormModal
@@ -69,5 +54,3 @@ const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
 };
 
 export default FormContainer;
-
-

@@ -77,7 +77,7 @@ const ParaPenyuluhClient = ({ data, count, role }: Props) => {
             </Link>
 
             {role === 'admin' && (
-              <FormContainer table="penyuluh" type="delete" id={item.id} />
+              <FormContainer table="penyuluh" type="delete" id={item.id} data={undefined} href={undefined} />
             )}
           </div>
         </td>
@@ -100,7 +100,7 @@ const ParaPenyuluhClient = ({ data, count, role }: Props) => {
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
             {role === 'admin' && (
-              <FormContainer table="penyuluh" type="create" />
+              <FormContainer table="penyuluh" type="create" data={undefined} id={undefined} href={undefined} />
             )}
           </div>
         </div>
