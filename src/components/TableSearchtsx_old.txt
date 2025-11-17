@@ -3,25 +3,23 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent } from 'react';
 
 type TableSearchProps = {
   value?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
-const TableSearch = ({ value = '', onChange }: TableSearchProps) => {
+const TableSearch = ({ value, onChange }: TableSearchProps) => {
   const router = useRouter();
-  const [internalValue, setInternalValue] = useState(value);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (typeof window === 'undefined') return;   // ⛔ FIX CRASH
+    const value = (e.currentTarget[0] as HTMLInputElement).value;
 
     const params = new URLSearchParams(window.location.search);
-    params.set('search', internalValue);
-
+    params.set('search', value);
     router.push(`${window.location.pathname}?${params}`);
   };
 
@@ -34,11 +32,8 @@ const TableSearch = ({ value = '', onChange }: TableSearchProps) => {
       <input
         type="text"
         placeholder="Search..."
-        value={internalValue}
-        onChange={(e) => {
-          setInternalValue(e.target.value);
-          onChange?.(e);
-        }}
+        value={value}
+        onChange={onChange}
         className="w-[200px] p-2 bg-transparent outline-none"
       />
     </form>
