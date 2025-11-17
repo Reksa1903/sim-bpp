@@ -40,7 +40,7 @@ const PenyuluhForm = ({
       id: data?.id ?? undefined,
       username: data?.username ?? '',
       email: data?.email ?? '',
-      password: '', // boleh kosong saat update
+      password: '',
       name: data?.name ?? '',
       surname: data?.surname ?? '',
       phone: data?.phone ?? '',
@@ -49,9 +49,8 @@ const PenyuluhForm = ({
         ? new Date(data.birthday).toISOString().split('T')[0]
         : '',
       gender: data?.gender ?? 'PRIA',
-      bidang: Array.isArray(data?.bidang)
-        ? data?.bidang.join(',')
-        : data?.bidang ?? '',
+      // ensure default is a comma-separated string for the input field
+      bidang: Array.isArray(data?.bidang) ? data.bidang.join(',') : (data?.bidang ?? ''),
     } as any,
   });
 
@@ -82,6 +81,17 @@ const PenyuluhForm = ({
 
       // Jika password kosong, JANGAN kirim supaya tidak diubah
       const trimmedPwd = (formValues.password ?? '').trim();
+
+      let bidangArray: string[] = [];
+      if (Array.isArray((formValues as any).bidang)) {
+        bidangArray = (formValues as any).bidang;
+      } else if (typeof (formValues as any).bidang === 'string') {
+        bidangArray = (formValues as any).bidang
+          .split(',')
+          .map((s: string) => s.trim())
+          .filter((s: string) => s.length > 0);
+      }
+
       const payload: any = {
         id: data?.id, // tetap kirim ke server untuk jaga-jaga
         username: formValues.username ?? '',
@@ -92,9 +102,7 @@ const PenyuluhForm = ({
         address: formValues.address ?? '',
         birthday: normalizeDate(formValues.birthday ?? ''),
         gender: formValues.gender ?? '',
-        bidang: Array.isArray(formValues.bidang)
-          ? formValues.bidang.join(',')
-          : formValues.bidang ?? '',
+        bidang: bidangArray,
         desaBinaanIds: desaIds,
         img: img?.secure_url ?? img ?? data?.img ?? null,
       };
