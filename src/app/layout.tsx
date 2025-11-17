@@ -33,11 +33,13 @@ export const viewport: Viewport = {
 
 // ⬇️ Import client wrapper tanpa SSR
 import ClerkRoot from './ClerkRoot';
+import RegisterSW from './register-sw';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id">
       <body className={inter.className}>
+        <RegisterSW />
         {/* Semua provider klien dipindah ke ClerkRoot */}
         <ClerkRoot>{children}</ClerkRoot>
       </body>
