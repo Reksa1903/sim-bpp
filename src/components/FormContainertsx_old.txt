@@ -66,6 +66,11 @@ const FormContainer = ({ table, type, data, id, href }: FormContainerProps) => {
 };
 
 export default FormContainer;
+function setError(message: string) {
+  throw new Error('Function not implemented.');
+}
 
-const [error, setError] = useState<string | null>(null);
-const [loading, setLoading] = useState<boolean>(true);
+function setLoading(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+
