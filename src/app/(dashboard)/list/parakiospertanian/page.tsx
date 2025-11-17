@@ -107,7 +107,7 @@ const ParaKiosPertanianListPage = async ({
 
           {/* Delete -> tetap hanya untuk admin */}
           {role === 'admin' && (
-            <FormContainer table="kisopertanian" type="delete" id={item.id} />
+            <FormContainer table="kiospertanian" type="delete" id={item.id} />
           )}
         </div>
       </td>
@@ -131,7 +131,7 @@ const ParaKiosPertanianListPage = async ({
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
             {role === 'admin' && (
-              <FormContainer table="kisopertanian" type="create" />
+              <FormContainer table="kiospertanian" type="create" />
             )}
           </div>
         </div>

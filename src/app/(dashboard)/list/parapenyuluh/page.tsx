@@ -1,14 +1,12 @@
 // src/app/(dashboard)/list/parapenyuluh/page.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 import prisma from "@/lib/prisma";
 import { getRole } from "@/lib/utils";
 import { Prisma, DesaBinaan, Penyuluh } from "@prisma/client";
 import ParaPenyuluhClient from "./_client";
-import { PenyuluhWithDesa } from "./types";
-
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-export const revalidate = 0;
-export const runtime = 'nodejs';
 
 const ParaPenyuluhListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
   const role = (await getRole()) || 'guest';

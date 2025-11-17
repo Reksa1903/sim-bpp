@@ -1,5 +1,5 @@
 // src/app/(dashboard)/list/parapenyuluh/_client.tsx
-"use client";
+'use client';
 
 import { PenyuluhWithDesa } from './types';
 import Table from '@/components/Table';

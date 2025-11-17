@@ -59,7 +59,7 @@ const SingleKiosPertanianPage = async ({
                 <h1 className="text-xl font-semibold">{kios.name}</h1>
                 {role === 'admin' && (
                   <FormContainer
-                    table="kisopertanian"
+                    table="kiospertanian"
                     type="update"
                     data={kios}
                   />

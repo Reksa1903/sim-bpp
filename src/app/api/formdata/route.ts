@@ -1,4 +1,4 @@
-// ✅ src/app/api/formdata/route.ts
+// src/app/api/formdata/route.ts
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -132,7 +132,7 @@ export async function GET(request: Request) {
         break;
       }
 
-      case 'kisopertanian': {
+      case 'kiospertanian': {
         relatedData = {};
         break;
       }
