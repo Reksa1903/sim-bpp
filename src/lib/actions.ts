@@ -22,7 +22,7 @@ export const createMateriFromForm = async (formData: FormData): Promise<FormResu
   try {
     const title = (formData.get("title") as string || "").trim();
     const penyuluhId = formData.get("penyuluhId") as string;
-    const fileName = (formData.get("fileName") as string || "").trim();
+    let fileName = (formData.get("fileName") as string || "").trim();
     const file = formData.get("file") as File | null;
 
     if (!title || !penyuluhId || !file || file.size === 0) {
@@ -32,11 +32,16 @@ export const createMateriFromForm = async (formData: FormData): Promise<FormResu
       return { success: false, error: true, message: "Hanya PDF yang diizinkan" };
     }
 
-    // File -> Buffer
+    // Tambahkan .pdf jika user lupa menulis ekstensi
+    if (!fileName.toLowerCase().endsWith(".pdf")) {
+      fileName = `${fileName}.pdf`;
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Upload ke Cloudinary sebagai RAW (PDF)
-    const publicIdBase = `${uuidv4()}-${(fileName || file.name).replace(/\.[^.]+$/,'')}`;
+    const baseName = fileName.replace(/\.pdf$/i, "");
+    const publicIdBase = `${uuidv4()}-${baseName}`;
+
     const uploaded = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
@@ -53,9 +58,8 @@ export const createMateriFromForm = async (formData: FormData): Promise<FormResu
       data: {
         title,
         penyuluhId,
-        fileName: fileName || uploaded.original_filename || file.name,
-        fileUrl: uploaded.secure_url, // ← simpan URL
-        // kalau model kalian ada uploadDate/updateDate pakai default di Prisma
+        fileName,
+        fileUrl: uploaded.secure_url,
       },
     });
 
@@ -66,20 +70,32 @@ export const createMateriFromForm = async (formData: FormData): Promise<FormResu
   }
 };
 
+
 // --- UPDATE ---
+// --- UPDATE MATERI ---
 export const updateMateriFromForm = async (formData: FormData): Promise<FormResult> => {
   try {
     const id = formData.get("id") as string;
     const title = (formData.get("title") as string || "").trim();
     const penyuluhId = formData.get("penyuluhId") as string;
-    const fileName = (formData.get("fileName") as string || "").trim();
+
+    let fileName = (formData.get("fileName") as string || "").trim();
     const file = formData.get("file") as File | null;
 
     let fileUrl: string | undefined;
 
+    // 🔥 Otomatis tambahkan .pdf jika tidak ditulis user
+    if (fileName && !fileName.toLowerCase().endsWith(".pdf")) {
+      fileName = `${fileName}.pdf`;
+    }
+
+    // Jika ada file baru → upload ulang
     if (file && file.size > 0) {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const publicIdBase = `${uuidv4()}-${(fileName || file.name).replace(/\.[^.]+$/,'')}`;
+
+      const baseName = fileName ? fileName.replace(/\.pdf$/i, "") : file.name.replace(/\.[^.]+$/, "");
+
+      const publicIdBase = `${uuidv4()}-${baseName}`;
 
       const uploaded = await new Promise<any>((resolve, reject) => {
         cloudinary.uploader.upload_stream(
@@ -94,16 +110,15 @@ export const updateMateriFromForm = async (formData: FormData): Promise<FormResu
       });
 
       fileUrl = uploaded.secure_url;
-      // (Opsional) kalau mau rapih, simpan juga uploaded.public_id ke kolom DB agar
-      // bisa dihapus saat delete. Untuk sekarang bisa dilewati.
     }
 
+    // Update database
     await prisma.materi.update({
       where: { id },
       data: {
         title,
         penyuluhId,
-        fileName: fileName || undefined,
+        ...(fileName && { fileName }),
         ...(fileUrl && { fileUrl }),
       },
     });

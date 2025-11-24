@@ -105,7 +105,11 @@ const MateriPenyuluhanListPage = async ({
       <td>
         <div className="flex items-center gap-2">
           {/* Semua role bisa download */}
-          <FormModal table="materi" type="download" href={item.fileUrl} />
+          <FormModal
+            table="materi"
+            type="download"
+            href={`/api/download?file=${encodeURIComponent(item.fileUrl)}&name=${encodeURIComponent(item.fileName)}`}
+          />
           {/* Hanya admin & penyuluh bisa update & delete */}
           {(role === 'admin' || role === 'penyuluh') && (
             <>
