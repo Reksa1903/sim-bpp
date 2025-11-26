@@ -8,7 +8,6 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV !== 'development',
   },
-
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.pexels.com', pathname: '/**' },
@@ -16,7 +15,6 @@ const nextConfig = {
     ],
     domains: ['res.cloudinary.com'],
   },
-
   async rewrites() {
     const api = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API;
     if (!api) return [];
@@ -30,9 +28,7 @@ const nextConfig = {
   },
 };
 
-// PWA wrapper — simple version (works with App Router)
 export default withPWA({
-  dest: 'public',
   register: true,
   skipWaiting: true,
 })(nextConfig);
