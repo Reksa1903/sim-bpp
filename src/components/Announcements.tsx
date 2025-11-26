@@ -8,18 +8,19 @@ const Announcements = () => {
 
   useEffect(() => {
     const baseUrl =
-      process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VERCEL_URL
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/pengumuman`
-        : '/api/pengumuman';
+      typeof window !== "undefined"
+        ? "/api/pengumuman"
+        : `${process.env.NEXT_PUBLIC_SITE_URL}/api/pengumuman`;
 
     fetch(baseUrl)
       .then((res) => (res.ok ? res.json() : []))
       .then(setData)
       .catch((err) => {
-        console.error('Failed to load pengumuman:', err);
+        console.error("Failed to load pengumuman:", err);
         setError(true);
       });
   }, []);
+
 
   if (error) {
     return (
@@ -44,10 +45,10 @@ const Announcements = () => {
           <div
             key={item.id}
             className={`rounded-md p-4 ${i === 0
-                ? 'bg-BppLightGreen'
-                : i === 1
-                  ? 'bg-BppLightYellow'
-                  : 'bg-BppLightBlue'
+              ? 'bg-BppLightGreen'
+              : i === 1
+                ? 'bg-BppLightYellow'
+                : 'bg-BppLightBlue'
               }`}
           >
             <div className="flex items-center justify-between">

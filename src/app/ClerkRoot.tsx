@@ -17,8 +17,8 @@ export default function ClerkRoot({ children }: { children: React.ReactNode }) {
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
       signInUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in'}
       signUpUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up'}
-      afterSignInUrl="/admin"
-      afterSignUpUrl="/admin"
+    // afterSignInUrl="/admin"
+    // afterSignUpUrl="/admin"
     >
       {children}
       <ToastContainer position="bottom-right" theme="dark" />

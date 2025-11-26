@@ -1,16 +1,20 @@
 // src/lib/auth.ts
-import { cookies } from 'next/headers';
+import { auth } from "@clerk/nextjs/server";
 
-/**
- * Mendapatkan sesi user dari cookies/session
- * sementara hardcode dulu
- */
+// Definisikan tipe metadata kamu sendiri saja
+interface CustomClaims {
+  metadata?: {
+    role?: string;
+  };
+}
+
 export const getUserSession = async () => {
-  const cookiesStore = cookies();
+  const { userId, sessionClaims } = await auth();
 
-  // misalkan kamu punya cookie `user_id` & `role`
-  const userId = cookiesStore.get('user_id')?.value || 'penyuluh1';
-  const role = cookiesStore.get('role')?.value || 'penyuluh';
+  // Paksa typing agar metadata dikenali
+  const claims = sessionClaims as CustomClaims;
+
+  const role = claims.metadata?.role ?? null;
 
   return { userId, role };
 };
