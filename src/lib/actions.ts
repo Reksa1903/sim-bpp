@@ -1,4 +1,4 @@
-// src/lib/action.ts
+// src/lib/actions.ts
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -305,7 +305,10 @@ export const deleteKegiatan = async (
 
 // === DokumentasiAcara === //
 // CREATE
-export const createDokumentasiAcaraFromForm = async (formData: FormData): Promise<FormResult> => {
+export const createDokumentasiAcaraFromForm = async (
+  _prevState: FormResult,
+  formData: FormData
+): Promise<FormResult> => {
   try {
     const title = (formData.get("title") as string || "").trim();
     const description = (formData.get("description") as string || "").trim();
@@ -353,7 +356,10 @@ export const createDokumentasiAcaraFromForm = async (formData: FormData): Promis
 };
 
 // UPDATE
-export const updateDokumentasiAcaraFromForm = async (formData: FormData): Promise<FormResult> => {
+export const updateDokumentasiAcaraFromForm = async (
+  _prevState: FormResult,
+  formData: FormData
+): Promise<FormResult> =>  {
   try {
     const id = formData.get("id") as string;
     const title = (formData.get("title") as string || "").trim();

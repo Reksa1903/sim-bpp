@@ -20,7 +20,7 @@ const createAction = async (
   _prevState: { success: boolean; error: boolean },
   formData: FormData
 ) => {
-  return await createDokumentasiAcaraFromForm(formData);
+  return await createDokumentasiAcaraFromForm(_prevState, formData);
 };
 
 // ✅ Wrapper untuk update
@@ -28,7 +28,7 @@ const updateAction = async (
   _prevState: { success: boolean; error: boolean },
   formData: FormData
 ) => {
-  return await updateDokumentasiAcaraFromForm(formData);
+  return await updateDokumentasiAcaraFromForm(_prevState, formData);
 };
 
 // ✅ Wrapper untuk delete
@@ -67,6 +67,7 @@ const DokumentasiAcaraForm = ({
 
   // Feedback toast + refresh setelah sukses
   useEffect(() => {
+    console.log("STATE:", state);
     if (state.success) {
       if (type === 'delete') {
         toast.success('Dokumentasi acara berhasil dihapus!');
