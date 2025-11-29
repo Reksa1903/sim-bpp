@@ -1,6 +1,15 @@
 // next.config.mjs
 import pkg from 'next-pwa';
-const withPWA = pkg.default ?? pkg;
+const nextPWA = pkg.default ?? pkg;
+
+const isDev = process.env.NODE_ENV !== 'production';
+
+const withPWA = nextPWA({
+  dest: 'public',          // tempat sw.js & workbox files
+  disable: isDev,          // matikan PWA di dev
+  register: true,
+  skipWaiting: true,
+});
 
 const nextConfig = {
   reactStrictMode: true,
@@ -8,7 +17,6 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV !== 'development',
   },
-
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.pexels.com', pathname: '/**' },
@@ -16,7 +24,6 @@ const nextConfig = {
     ],
     domains: ['res.cloudinary.com'],
   },
-
   async rewrites() {
     const api = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API;
     if (!api) return [];
@@ -30,13 +37,4 @@ const nextConfig = {
   },
 };
 
-const isDev = process.env.NODE_ENV !== "production";
-
-// PWA wrapper — simple version (works with App Router)
-export default withPWA({
-  pwa: {
-    disable: isDev,
-    register: true,
-    skipWaiting: true,
-  },
-});
+export default withPWA(nextConfig);
