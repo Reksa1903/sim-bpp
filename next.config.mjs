@@ -5,10 +5,13 @@ const nextPWA = pkg.default ?? pkg;
 const isDev = process.env.NODE_ENV !== 'production';
 
 const withPWA = nextPWA({
-  dest: 'public',          // tempat sw.js & workbox files
-  disable: isDev,          // matikan PWA di dev
+  dest: 'public',
+  disable: isDev,
   register: true,
   skipWaiting: true,
+  // FIX untuk Next 13/14 + next-pwa 5.6
+  runtimeCaching: [],
+  buildExcludes: [/app-build-manifest\.json$/],
 });
 
 const nextConfig = {
@@ -27,7 +30,6 @@ const nextConfig = {
   async rewrites() {
     const api = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API;
     if (!api) return [];
-
     return [
       { source: '/clerk/npm@clerk/:path*', destination: 'https://clerk.services/npm@clerk/:path*' },
       { source: '/clerk/assets/:path*', destination: 'https://clerk.services/assets/:path*' },
