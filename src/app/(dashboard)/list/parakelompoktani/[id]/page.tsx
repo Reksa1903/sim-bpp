@@ -80,14 +80,18 @@ const SingleKelompokTaniPage = async (
 
   // ---- Hitungan ringkas ----
   // const countPengumumanKelompok = kelompok._count.pengumuman;
-  const countPengumumanKelompok = await prisma.pengumuman.count({
-    where: {
-      OR: [
-        { kelompokTaniId: kelompok.id },
-        { desaBinaanId: kelompok.desaBinaanId },
-      ],
-    },
-  });
+  const countPengumumanKelompok = penyuluhId
+    ? await prisma.pengumuman.count({
+      where: {
+        penyuluhId,
+        OR: [
+          { desaBinaanId: kelompok.desaBinaanId },
+          { desaBinaanId: null },
+        ],
+      },
+    })
+    : 0;
+
   const countKegiatanPenyuluh = kegiatan.length;
   const countMateriPenyuluh = materi.length;
   const countKelompokDiDesa = kelompok.desaBinaan?._count.kelompokTani ?? 0;
