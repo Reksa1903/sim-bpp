@@ -82,13 +82,7 @@ const SingleKelompokTaniPage = async (
   // const countPengumumanKelompok = kelompok._count.pengumuman;
   const countPengumumanKelompok = penyuluhId
     ? await prisma.pengumuman.count({
-      where: {
-        penyuluhId,
-        OR: [
-          { desaBinaanId: kelompok.desaBinaanId },
-          { desaBinaanId: null },
-        ],
-      },
+      where: { penyuluhId },
     })
     : 0;
 
